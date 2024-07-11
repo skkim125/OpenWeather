@@ -24,7 +24,7 @@ class MainViewController: UIViewController {
         
         let image = #imageLiteral(resourceName: "gradationImg").cgImage
         view.layer.contents = image
-        
+        OpenWeatherManager.shared.callRequest(requestAPIType: Weather.self, lat: 36.99278, lon: 127.113838)
         configureHierarchy()
         configureLayout()
         configureView()
