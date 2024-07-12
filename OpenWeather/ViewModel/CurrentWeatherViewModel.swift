@@ -14,7 +14,6 @@ class WeatherViewModel {
     var inputCurrentWeather: Observable<Weather?> = Observable(nil)
     var inputSubWeather: Observable<SubWeather?> = Observable(nil)
     
-    
     var outputCityName: Observable<String> = Observable("")
     var outputCurrentTemperature: Observable<String> = Observable("")
     var outputHighestAndLowestTemperature: Observable<String> = Observable("")
@@ -26,14 +25,10 @@ class WeatherViewModel {
             self.callWeather(coord: coord ?? (37.5665, 126.9780))
         }
         
-        inputSubWeather.bind { sub in
-            self.outputCityName.value = sub?.city.name ?? ""
-        }
-        
         inputCurrentWeather.bind { current in
-            self.outputCurrentTemperature.value = "\(current?.weatherDetail.temp ?? 0.0)" + "º"
+            self.outputCurrentTemperature.value = current?.weatherDetail.tempStr ?? ""
             
-            self.outputHighestAndLowestTemperature.value = "최고: \(current?.weatherDetail.temp_max ?? 0.0) | 최저: \(current?.weatherDetail.temp_min ?? 0.0)º"
+            self.outputHighestAndLowestTemperature.value = current?.weatherDetail.maxminTempStr ?? ""
             
             self.outputWeatherOverview.value = "\(current?.weatherImage.first?.description ?? "")"
         }
@@ -46,6 +41,7 @@ class WeatherViewModel {
         
         self.owManager.callRequest(apiType: .subWeatherURL, requestAPIType: SubWeather.self, lat: coord.lat, lon: coord.lon) { data in
             self.inputSubWeather.value = data
+            self.outputCityName.value = data.city.name
         }
     }
 }
