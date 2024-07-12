@@ -7,6 +7,7 @@
 	objects = {
 
 /* Begin PBXBuildFile section */
+		0425CB802C41664E00B94F4D /* CurrentWeatherView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 0425CB7F2C41664E00B94F4D /* CurrentWeatherView.swift */; };
 		04671F622C3FBDD700EF5C1B /* AppDelegate.swift in Sources */ = {isa = PBXBuildFile; fileRef = 04671F612C3FBDD700EF5C1B /* AppDelegate.swift */; };
 		04671F642C3FBDD700EF5C1B /* SceneDelegate.swift in Sources */ = {isa = PBXBuildFile; fileRef = 04671F632C3FBDD700EF5C1B /* SceneDelegate.swift */; };
 		04671F662C3FBDD700EF5C1B /* MainViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = 04671F652C3FBDD700EF5C1B /* MainViewController.swift */; };
@@ -29,6 +30,7 @@
 /* End PBXBuildFile section */
 
 /* Begin PBXFileReference section */
+		0425CB7F2C41664E00B94F4D /* CurrentWeatherView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = CurrentWeatherView.swift; sourceTree = "<group>"; };
 		04671F5E2C3FBDD700EF5C1B /* OpenWeather.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = OpenWeather.app; sourceTree = BUILT_PRODUCTS_DIR; };
 		04671F612C3FBDD700EF5C1B /* AppDelegate.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AppDelegate.swift; sourceTree = "<group>"; };
 		04671F632C3FBDD700EF5C1B /* SceneDelegate.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SceneDelegate.swift; sourceTree = "<group>"; };
@@ -66,6 +68,7 @@
 		0425CB7E2C413D6E00B94F4D /* CustomView */ = {
 			isa = PBXGroup;
 			children = (
+				0425CB7F2C41664E00B94F4D /* CurrentWeatherView.swift */,
 				04671F942C410E6700EF5C1B /* WeatherDetailView.swift */,
 				04671F962C410EB900EF5C1B /* DividerLine.swift */,
 			);
@@ -227,6 +230,7 @@
 				04671F882C3FE06D00EF5C1B /* OpenWeatherManager.swift in Sources */,
 				04671F972C410EB900EF5C1B /* DividerLine.swift in Sources */,
 				04671F862C3FDA0E00EF5C1B /* APIKey.swift in Sources */,
+				0425CB802C41664E00B94F4D /* CurrentWeatherView.swift in Sources */,
 				04671F992C4118D000EF5C1B /* ThreeHoursCollectionViewCell.swift in Sources */,
 				04671F8A2C40EAA500EF5C1B /* CurrentWeatherViewModel.swift in Sources */,
 			);
@@ -372,6 +376,7 @@
 				ASSETCATALOG_COMPILER_GLOBAL_ACCENT_COLOR_NAME = AccentColor;
 				CODE_SIGN_STYLE = Automatic;
 				CURRENT_PROJECT_VERSION = 1;
+				DEVELOPMENT_TEAM = K7C455FTM9;
 				GENERATE_INFOPLIST_FILE = YES;
 				INFOPLIST_FILE = OpenWeather/Info.plist;
 				INFOPLIST_KEY_UIApplicationSupportsIndirectInputEvents = YES;
@@ -403,6 +408,7 @@
 				ASSETCATALOG_COMPILER_GLOBAL_ACCENT_COLOR_NAME = AccentColor;
 				CODE_SIGN_STYLE = Automatic;
 				CURRENT_PROJECT_VERSION = 1;
+				DEVELOPMENT_TEAM = K7C455FTM9;
 				GENERATE_INFOPLIST_FILE = YES;
 				INFOPLIST_FILE = OpenWeather/Info.plist;
 				INFOPLIST_KEY_UIApplicationSupportsIndirectInputEvents = YES;

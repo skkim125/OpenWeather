@@ -10,13 +10,8 @@ import SnapKit
 
 class MainViewController: UIViewController {
     private let scrollView = UIScrollView()
-    private let stackView = UIStackView()
+    private lazy var currentWeatherView = CurrentWeatherView(viewModel: viewModel)
     private let tableStackView = UIStackView()
-    private let cityNameLabel = UILabel()
-    private let currentTemperatureLabel = UILabel()
-    private let weatherOverviewLabel = UILabel()
-    private let dividerLine = UIView()
-    private let highestAndLowestTemperatureLabel = UILabel()
     
     private lazy var collectionView = {
         let cv = UICollectionView(frame: .zero, collectionViewLayout: threeHoursViewLayout())
@@ -24,6 +19,8 @@ class MainViewController: UIViewController {
         cv.dataSource = self
         cv.register(ThreeHoursCollectionViewCell.self, forCellWithReuseIdentifier: ThreeHoursCollectionViewCell.id)
         cv.backgroundColor = .clear
+        cv.showsHorizontalScrollIndicator = false
+        
         return cv
     }()
     
@@ -37,8 +34,7 @@ class MainViewController: UIViewController {
         layout.scrollDirection = .horizontal
         
         let width = UIScreen.main.bounds.width - (cellSpacing * 4 + sectionSpacing)
-        layout.itemSize = CGSize(width: width/5, height: width/2.2)
-        
+        layout.itemSize = CGSize(width: width/5, height: width/2.8)
         
         return layout
     }
@@ -69,22 +65,6 @@ class MainViewController: UIViewController {
     func bindData() {
         viewModel.inputCoordinate.value = (37.5665, 126.9780)
         
-        viewModel.outputCityName.bind { city in
-            self.cityNameLabel.text = city
-        }
-        
-        viewModel.outputCurrentTemperature.bind { ct in
-            self.currentTemperatureLabel.text = ct
-        }
-        
-        viewModel.outputHighestAndLowestTemperature.bind { temp in
-            self.highestAndLowestTemperatureLabel.text = temp
-        }
-        
-        viewModel.outputWeatherOverview.bind { overview in
-            self.weatherOverviewLabel.text = overview
-        }
-        
         viewModel.inputSubWeather.bind { _ in
             self.collectionView.reloadData()
         }
@@ -93,11 +73,7 @@ class MainViewController: UIViewController {
     func configureHierarchy() {
         view.addSubview(scrollView)
         
-        scrollView.addSubview(stackView)
-        stackView.addArrangedSubview(cityNameLabel)
-        stackView.addArrangedSubview(currentTemperatureLabel)
-        stackView.addArrangedSubview(weatherOverviewLabel)
-        stackView.addArrangedSubview(highestAndLowestTemperatureLabel)
+        scrollView.addSubview(currentWeatherView)
         
         scrollView.addSubview(tableStackView)
         tableStackView.addArrangedSubview(threeHoursView)
@@ -117,46 +93,26 @@ class MainViewController: UIViewController {
             make.top.horizontalEdges.equalTo(view.safeAreaLayoutGuide)
         }
         
-        stackView.snp.makeConstraints { make in
+        currentWeatherView.snp.makeConstraints { make in
             make.top.horizontalEdges.equalTo(scrollView)
-        }
-        
-        cityNameLabel.snp.makeConstraints { make in
-            make.top.equalTo(stackView.snp.top).offset(40)
-            make.height.equalTo(60)
-            make.centerX.equalTo(view.snp.centerX)
-        }
-        
-        currentTemperatureLabel.snp.makeConstraints { make in
-            make.height.equalTo(90)
-            make.centerX.equalTo(view.snp.centerX)
-        }
-        
-        weatherOverviewLabel.snp.makeConstraints { make in
-            make.height.equalTo(30)
-            make.centerX.equalTo(view.snp.centerX)
-        }
-        
-        highestAndLowestTemperatureLabel.snp.makeConstraints { make in
-            make.height.equalTo(30)
-            make.centerX.equalTo(view.snp.centerX)
+            make.centerX.equalTo(scrollView)
         }
         
         tableStackView.snp.makeConstraints { make in
-            make.top.equalTo(stackView.snp.bottom).offset(30)
+            make.top.equalTo(currentWeatherView.snp.bottom).offset(30)
             make.horizontalEdges.equalTo(view.safeAreaLayoutGuide).inset(20)
             make.bottom.equalTo(scrollView.self).inset(20)
         }
         
         threeHoursView.snp.makeConstraints { make in
             make.horizontalEdges.equalTo(tableStackView)
-            make.height.equalTo(200)
+            make.height.equalTo(160)
         }
         
         collectionView.snp.makeConstraints { make in
-            make.top.equalTo(threeHoursView.divider.snp.bottom).offset(15)
+            make.top.equalTo(threeHoursView.divider.snp.bottom).offset(10)
             make.horizontalEdges.equalTo(threeHoursView.snp.horizontalEdges)
-            make.bottom.equalTo(threeHoursView.snp.bottom)
+            make.bottom.equalTo(threeHoursView.snp.bottom).inset(10)
         }
         
         fiveDaysView.snp.makeConstraints { make in
@@ -192,26 +148,11 @@ class MainViewController: UIViewController {
     func configureView() {
         scrollView.showsVerticalScrollIndicator = true
         
-        stackView.axis = .vertical
+        currentWeatherView.axis = .vertical
         
         tableStackView.axis = .vertical
         tableStackView.spacing = 20
         
-        cityNameLabel.textColor = .black.withAlphaComponent(0.8)
-        cityNameLabel.font = .systemFont(ofSize: 50)
-        cityNameLabel.textAlignment = .center
-        
-        currentTemperatureLabel.textColor = .black.withAlphaComponent(0.8)
-        currentTemperatureLabel.font = .systemFont(ofSize: 90)
-        currentTemperatureLabel.textAlignment = .center
-        
-        weatherOverviewLabel.textColor = .black.withAlphaComponent(0.8)
-        weatherOverviewLabel.font = .systemFont(ofSize: 25)
-        weatherOverviewLabel.textAlignment = .center
-        
-        highestAndLowestTemperatureLabel.textColor = .black.withAlphaComponent(0.8)
-        highestAndLowestTemperatureLabel.font = .systemFont(ofSize: 20)
-        highestAndLowestTemperatureLabel.textAlignment = .center
         bottomView.backgroundColor = #colorLiteral(red: 0.9494348168, green: 0.9246538877, blue: 0.9809295535, alpha: 1)
         
         mapButton.setImage(UIImage(systemName: "map"), for: .normal)
@@ -223,6 +164,7 @@ class MainViewController: UIViewController {
 
 extension MainViewController: UICollectionViewDelegate, UICollectionViewDataSource {
     func collectionView(_ collectionView: UICollectionView, numberOfItemsInSection section: Int) -> Int {
+        
         return viewModel.inputSubWeather.value?.result.count ?? 0
     }
     

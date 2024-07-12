@@ -10,6 +10,7 @@ import Kingfisher
 import SnapKit
 
 class ThreeHoursCollectionViewCell: UICollectionViewCell {
+    let dayLabel = UILabel()
     let timeLabel = UILabel()
     let weatherImgView = UIImageView()
     let temperatureLabel = UILabel()
@@ -22,42 +23,60 @@ class ThreeHoursCollectionViewCell: UICollectionViewCell {
     }
     
     func configureHierarchy() {
+        contentView.addSubview(dayLabel)
         contentView.addSubview(timeLabel)
         contentView.addSubview(weatherImgView)
         contentView.addSubview(temperatureLabel)
     }
     
     func configureLayout() {
-        timeLabel.snp.makeConstraints { make in
-            make.top.equalTo(contentView.safeAreaLayoutGuide).offset(10)
+        
+        dayLabel.snp.makeConstraints { make in
+            make.top.equalTo(contentView.safeAreaLayoutGuide).offset(15)
             make.horizontalEdges.equalTo(contentView.safeAreaLayoutGuide)
             make.centerX.equalTo(contentView.snp.centerX)
-            make.height.equalTo(30)
+            make.height.equalTo(20)
+        }
+        
+        timeLabel.snp.makeConstraints { make in
+            make.top.equalTo(dayLabel.snp.bottom)
+            make.horizontalEdges.equalTo(contentView.safeAreaLayoutGuide)
+            make.centerX.equalTo(contentView.snp.centerX)
+            make.height.equalTo(15)
         }
         
         weatherImgView.snp.makeConstraints { make in
             make.top.equalTo(timeLabel.snp.bottom).offset(10)
             make.horizontalEdges.equalTo(contentView.safeAreaLayoutGuide)
             make.centerX.equalTo(contentView.snp.centerX)
-            make.size.equalTo(40)
+            make.size.equalTo(20)
         }
         
         temperatureLabel.snp.makeConstraints { make in
             make.top.equalTo(weatherImgView.snp.bottom).offset(10)
             make.horizontalEdges.equalTo(contentView.safeAreaLayoutGuide)
             make.centerX.equalTo(contentView.snp.centerX)
-            make.bottom.equalTo(contentView.safeAreaLayoutGuide).inset(10)
+            make.bottom.equalTo(contentView.safeAreaLayoutGuide).inset(20)
         }
     }
     
     func configureView(subWeather: Weather) {
-        print(subWeather.hour)
+        
+        dayLabel.text = subWeather.day
+        dayLabel.textColor = .darkGray
+        dayLabel.textAlignment = .center
+        dayLabel.font = .boldSystemFont(ofSize: 13)
+        
         timeLabel.text = subWeather.hour
         timeLabel.textAlignment = .center
+        timeLabel.font = .systemFont(ofSize: 14)
+        
         weatherImgView.kf.setImage(with: URL(string: subWeather.weatherImageURL))
         weatherImgView.contentMode = .scaleAspectFill
+        
         temperatureLabel.text = subWeather.weatherDetail.tempStr
         temperatureLabel.textAlignment = .center
+        temperatureLabel.font = .boldSystemFont(ofSize: 17)
     }
     
     @available(*, unavailable)

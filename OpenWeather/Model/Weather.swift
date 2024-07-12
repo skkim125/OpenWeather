@@ -13,6 +13,15 @@ struct Weather: Decodable {
     let weatherImage: [WeatherImage]
     let wind: Wind
     let clouds: Clouds
+    
+    var day: String {
+        let formatter = DateFormatter()
+        formatter.dateFormat = "M월 dd일"
+        
+        let date = Date(timeIntervalSince1970: TimeInterval(self.dt))
+        return formatter.string(from: date)
+    }
+    
     var hour: String {
         let formatter = DateFormatter()
         formatter.dateFormat = "HH시"
