@@ -12,14 +12,15 @@ class OpenWeatherManager {
     static let shared = OpenWeatherManager()
     private init() { }
     
-    func callRequest<T: Decodable>(requestAPIType: T.Type, lat: Double, lon: Double) {
-        guard let url = URL(string: OpenWeatherAPI.currentURL) else { return }
+    typealias CompletionHandler<T> = ((T) -> Void)
+    
+    func callRequest<T: Decodable>(apiType: OpenWeatherRouter, requestAPIType: T.Type, lat: Double, lon: Double, completionHandler: @escaping CompletionHandler<T>) {
+        guard let url = URL(string: OpenWeatherAPI.url + apiType.rawValue) else { return }
         
         let parameters: Parameters = [
             "lat": "\(lat)",
             "lon": "\(lon)",
             "appid": "\(OpenWeatherAPI.key)",
-            "exclude": "current",
             "units": "metric",
             "lang": "kr"
         ]
@@ -27,7 +28,7 @@ class OpenWeatherManager {
         AF.request(url, parameters: parameters).responseDecodable(of: T.self) { response in
             switch response.result {
             case .success(let data):
-                print("\(data)")
+                completionHandler(data)
             case .failure(let error):
                 print("\(error)")
             }

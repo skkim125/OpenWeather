@@ -8,14 +8,12 @@
 import Foundation
 
 struct Weather: Decodable {
-    let name: String
     let weatherDetail: WeatherDetail
     let weatherImage: [WeatherImage]
     let wind: Wind
     let clouds: Clouds
     
     enum CodingKeys: String, CodingKey {
-        case name = "name"
         case weatherDetail = "main"
         case weatherImage = "weather"
         case wind = "wind"
@@ -25,10 +23,16 @@ struct Weather: Decodable {
 
 struct SubWeather: Decodable {
     let result: [Weather]
+    let city: City
     
     enum CodingKeys: String, CodingKey {
         case result = "list"
+        case city = "city"
     }
+}
+
+struct City: Decodable {
+    let name: String
 }
 
 struct WeatherDetail: Decodable {

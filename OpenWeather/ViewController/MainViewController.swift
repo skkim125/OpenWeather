@@ -14,31 +14,55 @@ class MainViewController: UIViewController {
     private let cityNameLabel = UILabel()
     private let currentTemperatureLabel = UILabel()
     private let weatherOverviewLabel = UILabel()
-    private let HighestAndLowestTemperatureLabel = UILabel()
+    private let highestAndLowestTemperatureLabel = UILabel()
     private let bottomView = UIView()
     private let mapButton = UIButton()
     private let cityListButton = UIButton()
+    private let subWeatherCollectionView = UICollectionView()
+    
+    var viewModel = WeatherViewModel()
     
     override func viewDidLoad() {
         super.viewDidLoad()
         
         let image = #imageLiteral(resourceName: "gradationImg").cgImage
         view.layer.contents = image
-        OpenWeatherManager.shared.callRequest(requestAPIType: Weather.self, lat: 36.99278, lon: 127.113838)
+        
         configureHierarchy()
         configureLayout()
         configureView()
+        
+        bindData()
+    }
+    
+    func bindData() {
+        viewModel.inputCoordinate.value = (37.5665, 126.9780)
+        
+        viewModel.outputCityName.bind { city in
+            self.cityNameLabel.text = city
+        }
+        
+        viewModel.outputCurrentTemperature.bind { ct in
+            self.currentTemperatureLabel.text = ct
+        }
+        
+        viewModel.outputHighestAndLowestTemperature.bind { temp in
+            self.highestAndLowestTemperatureLabel.text = temp
+        }
+        
+        viewModel.outputWeatherOverview.bind { overview in
+            self.weatherOverviewLabel.text = overview
+        }
     }
     
     func configureHierarchy() {
-        // MARK: addSubView()
         view.addSubview(scrollView)
         
         scrollView.addSubview(stackView)
         stackView.addArrangedSubview(cityNameLabel)
         stackView.addArrangedSubview(currentTemperatureLabel)
         stackView.addArrangedSubview(weatherOverviewLabel)
-        stackView.addArrangedSubview(HighestAndLowestTemperatureLabel)
+        stackView.addArrangedSubview(highestAndLowestTemperatureLabel)
         
         view.addSubview(bottomView)
         bottomView.addSubview(mapButton)
@@ -58,7 +82,7 @@ class MainViewController: UIViewController {
         
         cityNameLabel.snp.makeConstraints { make in
             make.top.equalTo(stackView.snp.top).offset(40)
-            make.height.equalTo(50)
+            make.height.equalTo(60)
             make.centerX.equalTo(view.snp.centerX)
         }
         
@@ -72,7 +96,7 @@ class MainViewController: UIViewController {
             make.centerX.equalTo(view.snp.centerX)
         }
         
-        HighestAndLowestTemperatureLabel.snp.makeConstraints { make in
+        highestAndLowestTemperatureLabel.snp.makeConstraints { make in
             make.height.equalTo(30)
             make.centerX.equalTo(view.snp.centerX)
         }
@@ -102,26 +126,22 @@ class MainViewController: UIViewController {
         
         stackView.axis = .vertical
         
-        cityNameLabel.text = "JeJu City"
+        cityNameLabel.text = viewModel.inputSubWeather.value?.city.name ?? ""
         cityNameLabel.textColor = .black.withAlphaComponent(0.8)
         cityNameLabel.font = .systemFont(ofSize: 50)
         cityNameLabel.textAlignment = .center
         
-        currentTemperatureLabel.text = "27" + "º"
         currentTemperatureLabel.textColor = .black.withAlphaComponent(0.8)
         currentTemperatureLabel.font = .systemFont(ofSize: 90)
         currentTemperatureLabel.textAlignment = .center
         
-        weatherOverviewLabel.text = "Broken Clouds"
         weatherOverviewLabel.textColor = .black.withAlphaComponent(0.8)
         weatherOverviewLabel.font = .systemFont(ofSize: 25)
         weatherOverviewLabel.textAlignment = .center
         
-        
-        HighestAndLowestTemperatureLabel.text = "최고: 35 | 최저: -4.2º"
-        HighestAndLowestTemperatureLabel.textColor = .black.withAlphaComponent(0.8)
-        HighestAndLowestTemperatureLabel.font = .systemFont(ofSize: 20)
-        HighestAndLowestTemperatureLabel.textAlignment = .center
+        highestAndLowestTemperatureLabel.textColor = .black.withAlphaComponent(0.8)
+        highestAndLowestTemperatureLabel.font = .systemFont(ofSize: 20)
+        highestAndLowestTemperatureLabel.textAlignment = .center
         bottomView.backgroundColor = #colorLiteral(red: 0.9494348168, green: 0.9246538877, blue: 0.9809295535, alpha: 1)
         
         mapButton.setImage(UIImage(systemName: "map"), for: .normal)
