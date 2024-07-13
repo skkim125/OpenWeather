@@ -16,7 +16,7 @@ class WeatherViewModel {
     
     var outputCityName: Observable<String> = Observable("")
     var outputCurrentTemperature: Observable<String> = Observable("")
-    var outputHighestAndLowestTemperature: Observable<String> = Observable("")
+    var outputMaxAndMinTemperature: Observable<String> = Observable("")
     var outputWeatherOverview: Observable<String> = Observable("")
  
     init() {
@@ -28,20 +28,25 @@ class WeatherViewModel {
         inputCurrentWeather.bind { current in
             self.outputCurrentTemperature.value = current?.weatherDetail.tempStr ?? ""
             
-            self.outputHighestAndLowestTemperature.value = current?.weatherDetail.maxminTempStr ?? ""
+            self.outputMaxAndMinTemperature.value = current?.weatherDetail.maxminTempStr ?? ""
             
             self.outputWeatherOverview.value = "\(current?.weatherImage.first?.description ?? "")"
         }
     }
     
     func callWeather(coord: (lat: Double, lon: Double)) {
-        self.owManager.callRequest(apiType: .currentURL, requestAPIType: Weather.self, lat: coord.lat, lon: coord.lon) { data in
+        self.owManager.callRequest(api: .currentURL(coord.lat, coord.lon), requestAPIType: Weather.self) { data in
             self.inputCurrentWeather.value = data
         }
         
-        self.owManager.callRequest(apiType: .subWeatherURL, requestAPIType: SubWeather.self, lat: coord.lat, lon: coord.lon) { data in
+        self.owManager.callRequest(api: .subWeatherURL(coord.lat, coord.lon), requestAPIType: SubWeather.self) { data in
             self.inputSubWeather.value = data
             self.outputCityName.value = data.city.name
+            
+            //            for i in self.inputSubWeather.value!.fiveDays {
+            //                print(i.dayOfWeek)
+            //            }
+            // print(self.inputSubWeather.value?.fiveDays[0].dayOfWeek)
         }
     }
 }

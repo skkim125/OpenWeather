@@ -11,7 +11,7 @@ import SnapKit
 class WeatherDetailView: UIView {
     private let titleImageView = UIImageView()
     private let titleLabel = UILabel()
-    let divider = DividerLine(color: .white)
+    let divider = DividerLine(color: .gray)
     
     init(image: String, title: String) {
         super.init(frame: .zero)

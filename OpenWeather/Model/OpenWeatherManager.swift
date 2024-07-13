@@ -14,7 +14,7 @@ class OpenWeatherManager {
     
     typealias CompletionHandler<T> = ((T) -> Void)
     
-    func callRequest<T: Decodable>(api: OpenWeatherRouter, requestAPIType: T.Type, lat: Double, lon: Double, completionHandler: @escaping CompletionHandler<T>) {
+    func callRequest<T: Decodable>(api: OpenWeatherRouter, requestAPIType: T.Type, completionHandler: @escaping CompletionHandler<T>) {
         guard let url = URL(string: OpenWeatherAPI.url + api.apiType) else { return }
         
         AF.request(url, parameters: api.parameters).responseDecodable(of: T.self) { response in

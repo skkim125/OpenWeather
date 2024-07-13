@@ -11,7 +11,7 @@ class CurrentWeatherView: UIStackView {
     private let cityNameLabel = UILabel()
     private let currentTemperatureLabel = UILabel()
     private let weatherOverviewLabel = UILabel()
-    private let highestAndLowestTemperatureLabel = UILabel()
+    private let max_minTemperatureLabel = UILabel()
     
     init(viewModel: WeatherViewModel) {
         super.init(frame: .zero)
@@ -31,8 +31,8 @@ class CurrentWeatherView: UIStackView {
             self.currentTemperatureLabel.text = ct
         }
         
-        viewModel.outputHighestAndLowestTemperature.bind { temp in
-            self.highestAndLowestTemperatureLabel.text = temp
+        viewModel.outputMaxAndMinTemperature.bind { temp in
+            self.max_minTemperatureLabel.text = temp
         }
         
         viewModel.outputWeatherOverview.bind { overview in
@@ -44,7 +44,7 @@ class CurrentWeatherView: UIStackView {
         addArrangedSubview(cityNameLabel)
         addArrangedSubview(currentTemperatureLabel)
         addArrangedSubview(weatherOverviewLabel)
-        addArrangedSubview(highestAndLowestTemperatureLabel)
+        addArrangedSubview(max_minTemperatureLabel)
     }
     
     func configureLayout() {
@@ -64,7 +64,7 @@ class CurrentWeatherView: UIStackView {
             make.centerX.equalTo(self.snp.centerX)
         }
         
-        highestAndLowestTemperatureLabel.snp.makeConstraints { make in
+        max_minTemperatureLabel.snp.makeConstraints { make in
             make.height.equalTo(30)
             make.centerX.equalTo(self.snp.centerX)
         }
@@ -83,9 +83,9 @@ class CurrentWeatherView: UIStackView {
         weatherOverviewLabel.font = .systemFont(ofSize: 25)
         weatherOverviewLabel.textAlignment = .center
         
-        highestAndLowestTemperatureLabel.textColor = .black.withAlphaComponent(0.8)
-        highestAndLowestTemperatureLabel.font = .systemFont(ofSize: 20)
-        highestAndLowestTemperatureLabel.textAlignment = .center
+        max_minTemperatureLabel.textColor = .black.withAlphaComponent(0.8)
+        max_minTemperatureLabel.font = .systemFont(ofSize: 20)
+        max_minTemperatureLabel.textAlignment = .center
     }
     
     required init(coder: NSCoder) {

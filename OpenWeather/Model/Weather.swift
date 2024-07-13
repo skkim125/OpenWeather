@@ -22,6 +22,15 @@ struct Weather: Decodable {
         return formatter.string(from: date)
     }
     
+    var dayOfWeek: String {
+        let formatter = DateFormatter()
+        formatter.locale = Locale(identifier: "ko_KR")
+        formatter.dateFormat = "E"
+        
+        let date = Date(timeIntervalSince1970: TimeInterval(self.dt))
+        return formatter.string(from: date)
+    }
+    
     var hour: String {
         let formatter = DateFormatter()
         formatter.dateFormat = "HH시"
@@ -46,6 +55,27 @@ struct Weather: Decodable {
 struct SubWeather: Decodable {
     let result: [Weather]
     let city: City
+    
+    var rangeOfTomorrow: [Weather] {
+        let first = result[result.startIndex]
+        let rangeOfTomorrowArray = result.filter({ date in
+            let tomorrow = Date(timeIntervalSince1970: TimeInterval(first.dt)).addingTimeInterval(86400).timeIntervalSince1970
+            return TimeInterval(date.dt) < tomorrow
+        })
+        
+        return rangeOfTomorrowArray
+    }
+    
+    var fiveDays: [Weather] {
+        let fiveDaysArray = result.filter({ date in
+            let fiveDays = Date().addingTimeInterval(86400 * 5).timeIntervalSince1970
+            return TimeInterval(date.dt) <= fiveDays
+        }).filter({ date in
+            Date(timeIntervalSince1970: TimeInterval(date.dt)).timeIntervalSince1970 == Calendar.current.startOfDay(for: Date(timeIntervalSince1970: TimeInterval(date.dt))).timeIntervalSince1970
+        })
+        
+        return fiveDaysArray
+    }
     
     enum CodingKeys: String, CodingKey {
         case result = "list"

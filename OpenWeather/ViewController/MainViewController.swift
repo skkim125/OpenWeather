@@ -6,6 +6,7 @@
 //
 
 import UIKit
+import MapKit
 import SnapKit
 
 class MainViewController: UIViewController {
@@ -13,7 +14,8 @@ class MainViewController: UIViewController {
     private lazy var currentWeatherView = CurrentWeatherView(viewModel: viewModel)
     private let tableStackView = UIStackView()
     
-    private lazy var collectionView = {
+    private let threeHoursView = WeatherDetailView(image: "calendar", title: "3시간 간격의 일기예보")
+    private lazy var threeHoursCollectionView = {
         let cv = UICollectionView(frame: .zero, collectionViewLayout: threeHoursViewLayout())
         cv.delegate = self
         cv.dataSource = self
@@ -23,29 +25,39 @@ class MainViewController: UIViewController {
         
         return cv
     }()
-    
     func threeHoursViewLayout() -> UICollectionViewLayout {
         let layout = UICollectionViewFlowLayout()
-        let cellSpacing: CGFloat = 5
+        let cellSpacing: CGFloat = 10
         let sectionSpacing: CGFloat = 5
-        layout.sectionInset = .init(top: sectionSpacing, left: sectionSpacing, bottom: sectionSpacing, right: sectionSpacing)
+        layout.sectionInset = .init(top: sectionSpacing, left: 0, bottom: sectionSpacing, right: 0)
         layout.minimumInteritemSpacing = cellSpacing
         layout.minimumLineSpacing = sectionSpacing
         layout.scrollDirection = .horizontal
         
-        let width = UIScreen.main.bounds.width - (cellSpacing * 4 + sectionSpacing)
-        layout.itemSize = CGSize(width: width/5, height: width/2.8)
+        let width = UIScreen.main.bounds.width - (cellSpacing * 5)
+        layout.itemSize = CGSize(width: width/6, height: width/2.7)
         
         return layout
     }
     
-    private let threeHoursView = WeatherDetailView(image: "calendar", title: "3시간 간격의 일기예보")
     private let fiveDaysView = WeatherDetailView(image: "calendar", title: "5일 간의 일기예보")
-    private let currentLocationView = WeatherDetailView(image: "mappin.and.ellipse", title: "위치")
+    private lazy var fiveDaysViewTableView: UITableView = {
+        let tv = UITableView()
+        tv.delegate = self
+        tv.dataSource = self
+        tv.register(FiveDaysTableViewCell.self, forCellReuseIdentifier: FiveDaysTableViewCell.id)
+        tv.backgroundColor = .clear
+        tv.rowHeight = 50
+        tv.separatorColor = .gray
+        tv.separatorInset = .zero
+        
+        return tv
+    }()
     
-    private let bottomView = UIView()
-    private let mapButton = UIButton()
-    private let cityListButton = UIButton()
+    private let currentLocationView = WeatherDetailView(image: "mappin.and.ellipse", title: "위치")
+    private let mapView = MKMapView()
+    
+    private let bottomView = MainBottomView()
     
     var viewModel = WeatherViewModel()
     
@@ -66,7 +78,8 @@ class MainViewController: UIViewController {
         viewModel.inputCoordinate.value = (37.5665, 126.9780)
         
         viewModel.inputSubWeather.bind { _ in
-            self.collectionView.reloadData()
+            self.threeHoursCollectionView.reloadData()
+            self.fiveDaysViewTableView.reloadData()
         }
     }
     
@@ -74,16 +87,18 @@ class MainViewController: UIViewController {
         view.addSubview(scrollView)
         
         scrollView.addSubview(currentWeatherView)
-        
         scrollView.addSubview(tableStackView)
+        
         tableStackView.addArrangedSubview(threeHoursView)
+        threeHoursView.addSubview(threeHoursCollectionView)
+        
         tableStackView.addArrangedSubview(fiveDaysView)
+        fiveDaysView.addSubview(fiveDaysViewTableView)
+        
         tableStackView.addArrangedSubview(currentLocationView)
-        threeHoursView.addSubview(collectionView)
+        currentLocationView.addSubview(mapView)
         
         view.addSubview(bottomView)
-        bottomView.addSubview(mapButton)
-        bottomView.addSubview(cityListButton)
     }
     
     
@@ -109,15 +124,21 @@ class MainViewController: UIViewController {
             make.height.equalTo(160)
         }
         
-        collectionView.snp.makeConstraints { make in
+        threeHoursCollectionView.snp.makeConstraints { make in
             make.top.equalTo(threeHoursView.divider.snp.bottom).offset(10)
-            make.horizontalEdges.equalTo(threeHoursView.snp.horizontalEdges)
+            make.horizontalEdges.equalTo(threeHoursView.snp.horizontalEdges).inset(20)
             make.bottom.equalTo(threeHoursView.snp.bottom).inset(10)
         }
         
         fiveDaysView.snp.makeConstraints { make in
             make.horizontalEdges.equalTo(tableStackView)
-            make.height.equalTo(300)
+            make.height.equalTo(320)
+        }
+        
+        fiveDaysViewTableView.snp.makeConstraints { make in
+            make.top.equalTo(fiveDaysView.divider.snp.bottom)
+            make.horizontalEdges.equalTo(fiveDaysView.snp.horizontalEdges).inset(20)
+            make.bottom.equalTo(fiveDaysView.snp.bottom).inset(10)
         }
         
         currentLocationView.snp.makeConstraints { make in
@@ -125,23 +146,16 @@ class MainViewController: UIViewController {
             make.height.equalTo(400)
         }
         
+        mapView.snp.makeConstraints { make in
+            make.top.equalTo(currentLocationView.divider.snp.bottom).offset(20)
+            make.horizontalEdges.bottom.equalTo(currentLocationView).inset(20)
+        }
+        
         bottomView.snp.makeConstraints { make in
             make.top.equalTo(scrollView.snp.bottom)
             make.bottom.equalTo(view.snp.bottom)
             make.horizontalEdges.equalTo(view)
             make.height.equalTo(80)
-        }
-        
-        mapButton.snp.makeConstraints { make in
-            make.top.equalTo(bottomView.safeAreaLayoutGuide)
-            make.leading.equalTo(bottomView.safeAreaLayoutGuide).inset(10)
-            make.size.equalTo(40)
-        }
-        
-        cityListButton.snp.makeConstraints { make in
-            make.top.equalTo(bottomView.safeAreaLayoutGuide)
-            make.trailing.equalTo(bottomView.safeAreaLayoutGuide).inset(10)
-            make.size.equalTo(40)
         }
     }
     
@@ -154,26 +168,37 @@ class MainViewController: UIViewController {
         tableStackView.spacing = 20
         
         bottomView.backgroundColor = #colorLiteral(red: 0.9494348168, green: 0.9246538877, blue: 0.9809295535, alpha: 1)
-        
-        mapButton.setImage(UIImage(systemName: "map"), for: .normal)
-        mapButton.tintColor = .black
-        cityListButton.setImage(UIImage(systemName: "list.bullet"), for: .normal)
-        cityListButton.tintColor = .black
     }
 }
 
 extension MainViewController: UICollectionViewDelegate, UICollectionViewDataSource {
     func collectionView(_ collectionView: UICollectionView, numberOfItemsInSection section: Int) -> Int {
-        
-        return viewModel.inputSubWeather.value?.result.count ?? 0
+
+        return viewModel.inputSubWeather.value?.rangeOfTomorrow.count ?? 0
     }
     
     func collectionView(_ collectionView: UICollectionView, cellForItemAt indexPath: IndexPath) -> UICollectionViewCell {
-        let cell = collectionView.dequeueReusableCell(withReuseIdentifier: ThreeHoursCollectionViewCell.id, for: indexPath) as! ThreeHoursCollectionViewCell
+        guard let cell = collectionView.dequeueReusableCell(withReuseIdentifier: ThreeHoursCollectionViewCell.id, for: indexPath) as? ThreeHoursCollectionViewCell else { return UICollectionViewCell() }
         
-        if let value = viewModel.inputSubWeather.value {
+        if let data = viewModel.inputSubWeather.value {
             cell.backgroundColor = .clear
-            cell.configureView(subWeather: value.result[indexPath.row])
+            cell.configureView(subWeather: data.result[indexPath.row])
+        }
+        
+        return cell
+    }
+}
+
+extension MainViewController: UITableViewDelegate, UITableViewDataSource {
+    func tableView(_ tableView: UITableView, numberOfRowsInSection section: Int) -> Int {
+        return viewModel.inputSubWeather.value?.fiveDays.count ?? 0
+    }
+    
+    func tableView(_ tableView: UITableView, cellForRowAt indexPath: IndexPath) -> UITableViewCell {
+        guard let cell = tableView.dequeueReusableCell(withIdentifier: FiveDaysTableViewCell.id, for: indexPath) as? FiveDaysTableViewCell else { return UITableViewCell() }
+        
+        if let data = viewModel.inputSubWeather.value {
+            cell.configureView(weather: data.fiveDays[indexPath.row])
         }
         
         return cell
