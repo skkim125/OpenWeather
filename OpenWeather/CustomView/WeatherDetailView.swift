@@ -24,19 +24,14 @@ class WeatherDetailView: UIView {
         layer.cornerRadius = 12
         clipsToBounds = true
     }
-    
-    @available(*, unavailable)
-    required init?(coder: NSCoder) {
-        fatalError("init(coder:) has not been implemented")
-    }
-    
-    func configureHierarchy() {
+
+    private func configureHierarchy() {
         addSubview(titleImageView)
         addSubview(titleLabel)
         addSubview(divider)
     }
     
-    func configureLayout() {
+    private func configureLayout() {
         titleImageView.snp.makeConstraints { make in
             make.top.equalTo(safeAreaLayoutGuide).inset(15)
             make.leading.equalTo(safeAreaLayoutGuide).inset(20)
@@ -55,19 +50,17 @@ class WeatherDetailView: UIView {
         }
     }
     
-    func configureDetailView(view: UIView) {
-        view.snp.makeConstraints { make in
-            make.top.equalTo(divider.snp.bottom).offset(10)
-            make.horizontalEdges.equalTo(safeAreaLayoutGuide).inset(20)
-        }
-    }
-    
-    func configureView(image: String, title: String) {
+    private func configureView(image: String, title: String) {
         titleImageView.image = UIImage(systemName: image)
         titleImageView.tintColor = .darkGray
         
         titleLabel.text = title
         titleLabel.textColor = .darkGray
         titleLabel.font = .systemFont(ofSize: 14)
+    }
+    
+    @available(*, unavailable)
+    required init?(coder: NSCoder) {
+        fatalError("init(coder:) has not been implemented")
     }
 }

@@ -9,7 +9,7 @@ import UIKit
 import SnapKit
 
 class MainBottomView: UIView {
-    let mapButton = UIButton()
+    private let mapButton = UIButton()
     let cityListButton = UIButton()
     
     init() {
@@ -20,12 +20,12 @@ class MainBottomView: UIView {
         configureView()
     }
     
-    func configureHierarchy() {
+    private func configureHierarchy() {
         addSubview(mapButton)
         addSubview(cityListButton)
     }
     
-    func configureLayout() {
+    private func configureLayout() {
         mapButton.snp.makeConstraints { make in
             make.top.equalTo(safeAreaLayoutGuide)
             make.leading.equalTo(safeAreaLayoutGuide).inset(10)
@@ -39,7 +39,7 @@ class MainBottomView: UIView {
         }
     }
     
-    func configureView() {
+    private func configureView() {
         mapButton.setImage(UIImage(systemName: "map"), for: .normal)
         mapButton.tintColor = .black
         
@@ -47,6 +47,7 @@ class MainBottomView: UIView {
         cityListButton.tintColor = .black
     }
     
+    @available(*, unavailable)
     required init?(coder: NSCoder) {
         fatalError("init(coder:) has not been implemented")
     }

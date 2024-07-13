@@ -22,13 +22,13 @@ class CityListTableViewCell: UITableViewCell {
         configureLayout()
     }
     
-    func configureHierarchy() {
+    private func configureHierarchy() {
         contentView.addSubview(hashImageView)
         contentView.addSubview(cityNameLabel)
         contentView.addSubview(countryLabel)
     }
     
-    func configureLayout() {
+    private func configureLayout() {
         hashImageView.snp.makeConstraints { make in
             make.centerY.equalTo(contentView)
             make.size.equalTo(30)

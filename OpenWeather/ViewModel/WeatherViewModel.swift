@@ -10,24 +10,28 @@ import MapKit
 
 class WeatherViewModel {
     private let owManager = OpenWeatherManager.shared
+    private let userdefaultsManager = UserDefaultsManager.shared
     
-    var inputCityID: Observable<Int?> = Observable(nil) // 입력 받는 id
+    var inputCityID: Observable<Int> = Observable(0) // 입력 받는 id
     var inputCityList: Observable<[City]> = Observable([])
     var inputCurrentWeather: Observable<Weather?> = Observable(nil)
     var inputSubWeather: Observable<SubWeather?> = Observable(nil)
     
     var outputCityID: Observable<Int> = Observable(0) // 호출 id
     var outputCity: Observable<City?> = Observable(nil)
-    var outputCurrentTemperature: Observable<String> = Observable("")
-    var outputMaxAndMinTemperature: Observable<String> = Observable("")
-    var outputWeatherOverview: Observable<String> = Observable("")
-    var outputMapCoord: Observable<CLLocationCoordinate2D> = Observable(CLLocationCoordinate2D(latitude: 0.0, longitude: 0.0))
+    var outputCurrentTemperature: Observable<String?> = Observable(nil)
+    var outputMaxAndMinTemperature: Observable<String?> = Observable(nil)
+    var outputWeatherOverview: Observable<String?> = Observable(nil)
+    var outputMapCoord: Observable<CLLocationCoordinate2D?> = Observable(CLLocationCoordinate2D(latitude: 0.0, longitude: 0.0))
+    var outputShowAlert: Observable<Bool> = Observable(false)
  
     init() {
         
         fetchJson()
+        
+        inputCityID.value = userdefaultsManager.savedID
         inputCityID.bind { id in
-            if let id = id {
+            if id != 0 {
                 self.outputCityID.value = id
             } else {
                 self.outputCityID.value = 1835847
@@ -41,26 +45,36 @@ class WeatherViewModel {
         }
         
         inputCurrentWeather.bind { current in
-            self.outputCurrentTemperature.value = current?.weatherDetail.tempStr ?? ""
+            self.outputCurrentTemperature.value = current?.weatherDetail.tempStr ?? "--º"
             
-            self.outputMaxAndMinTemperature.value = current?.weatherDetail.maxminTempStr ?? ""
+            self.outputMaxAndMinTemperature.value = current?.weatherDetail.maxminTempStr ?? "최고: --º | 최저: --º"
             
-            self.outputWeatherOverview.value = "\(current?.weatherImage.first?.description ?? "")"
+            self.outputWeatherOverview.value = current?.weatherImage.first?.description ?? "--"
         }
     }
     
-    func callWeather(id: Int) {
+    private func callWeather(id: Int) {
         self.owManager.callRequest(api: .currentURL(id), requestAPIType: Weather.self) { data in
-            self.inputCurrentWeather.value = data
+            if let data = data {
+                self.inputCurrentWeather.value = data
+                self.outputShowAlert.value = false
+            } else {
+                self.outputShowAlert.value = true
+            }
         }
         
         self.owManager.callRequest(api: .subWeatherURL(id), requestAPIType: SubWeather.self) { data in
-            self.inputSubWeather.value = data
-            self.outputMapCoord.value = CLLocationCoordinate2D(latitude: data.city.coord.lat, longitude: data.city.coord.lon)
+            if let data = data {
+                self.inputSubWeather.value = data
+                self.outputMapCoord.value = CLLocationCoordinate2D(latitude: data.city.coord.lat, longitude: data.city.coord.lon)
+                self.outputShowAlert.value = false
+            } else {
+                self.outputShowAlert.value = true
+            }
         }
     }
     
-    func fetchJson() {
+    private func fetchJson() {
         guard let path = Bundle.main.path(forResource: "CityList", ofType: "json"), let jsonStr = try? String(contentsOfFile: path) else {
             return
         }
@@ -72,9 +86,5 @@ class WeatherViewModel {
            let cities = try? decoder.decode([City].self, from: data) {
             inputCityList.value = cities
         }
-    }
-    
-    func pickCity(city: City) {
-        inputCityID.value = city.id
     }
 }

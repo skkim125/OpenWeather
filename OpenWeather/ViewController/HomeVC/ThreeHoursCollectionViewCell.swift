@@ -22,14 +22,14 @@ class ThreeHoursCollectionViewCell: UICollectionViewCell {
         configureLayout()
     }
     
-    func configureHierarchy() {
+    private func configureHierarchy() {
         contentView.addSubview(dayLabel)
         contentView.addSubview(timeLabel)
         contentView.addSubview(weatherImgView)
         contentView.addSubview(temperatureLabel)
     }
     
-    func configureLayout() {
+    private func configureLayout() {
         
         dayLabel.snp.makeConstraints { make in
             make.top.equalTo(contentView.safeAreaLayoutGuide).offset(15)

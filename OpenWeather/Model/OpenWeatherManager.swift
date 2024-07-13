@@ -12,7 +12,7 @@ class OpenWeatherManager {
     static let shared = OpenWeatherManager()
     private init() { }
     
-    typealias CompletionHandler<T> = ((T) -> Void)
+    typealias CompletionHandler<T> = ((T?) -> Void)
     
     func callRequest<T: Decodable>(api: OpenWeatherRouter, requestAPIType: T.Type, completionHandler: @escaping CompletionHandler<T>) {
         guard let url = URL(string: OpenWeatherAPI.url + api.apiType) else { return }
@@ -22,7 +22,8 @@ class OpenWeatherManager {
             case .success(let data):
                 completionHandler(data)
             case .failure(let error):
-                print("\(error)")
+                print(error)
+                completionHandler(nil)
             }
         }
     }

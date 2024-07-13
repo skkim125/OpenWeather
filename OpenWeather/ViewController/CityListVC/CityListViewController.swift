@@ -39,7 +39,7 @@ class CityListViewController: UIViewController {
         configureLayout()
     }
     
-    func configureNavigationBar() {
+    private func configureNavigationBar() {
         navigationItem.title = "City List"
         navigationController?.navigationBar.largeTitleTextAttributes = [.foregroundColor: UIColor.white]
         navigationItem.largeTitleDisplayMode = .always
@@ -50,16 +50,16 @@ class CityListViewController: UIViewController {
         navigationItem.leftBarButtonItem = UIBarButtonItem(image: UIImage(systemName: "chevron.backward"), style: .plain, target: self, action: #selector(backButtonClicked))
     }
     
-    @objc func backButtonClicked() {
+    @objc private func backButtonClicked() {
         navigationController?.popViewController(animated: true)
     }
     
-    func configureHierarchy() {
+    private func configureHierarchy() {
         view.addSubview(searchBar)
         view.addSubview(cityListTableView)
     }
     
-    func configureLayout() {
+    private func configureLayout() {
         searchBar.snp.makeConstraints { make in
             make.top.equalTo(view.safeAreaLayoutGuide).offset(10)
             make.horizontalEdges.equalTo(view.safeAreaLayoutGuide)

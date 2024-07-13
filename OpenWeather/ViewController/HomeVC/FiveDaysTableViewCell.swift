@@ -23,14 +23,14 @@ class FiveDaysTableViewCell: UITableViewCell {
         configureLayout()
     }
     
-    func configureHierarchy() {
+    private func configureHierarchy() {
         contentView.addSubview(daysLabel)
         contentView.addSubview(dayWeatherImageView)
         contentView.addSubview(minTempLabel)
         contentView.addSubview(maxTempLabel)
     }
     
-    func configureLayout() {
+    private func configureLayout() {
         daysLabel.snp.makeConstraints { make in
             make.leading.equalTo(contentView.safeAreaLayoutGuide).offset(10)
             make.centerY.equalTo(contentView)
@@ -78,13 +78,5 @@ class FiveDaysTableViewCell: UITableViewCell {
     
     required init?(coder: NSCoder) {
         fatalError("init(coder:) has not been implemented")
-    }
-}
-
-extension String {
-    static func transTempStr(_ temp: Double) -> String {
-        let intTemp = Int(temp)
-        
-        return String(intTemp) + "º"
     }
 }
