@@ -181,6 +181,16 @@ class MainViewController: UIViewController {
         tableStackView.spacing = 20
         
         bottomView.backgroundColor = #colorLiteral(red: 0.9494348168, green: 0.9246538877, blue: 0.9809295535, alpha: 1)
+        
+        bottomView.cityListButton.isUserInteractionEnabled = true
+        bottomView.cityListButton.addTarget(self, action: #selector(cityListButtonClicked), for: .touchUpInside)
+    }
+    
+    @objc func cityListButtonClicked() {
+        print("클릭")
+        let vc = CityListViewController()
+        
+        navigationController?.pushViewController(vc, animated: true)
     }
 }
 

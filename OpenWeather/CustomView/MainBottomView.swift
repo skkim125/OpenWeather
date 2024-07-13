@@ -9,9 +9,8 @@ import UIKit
 import SnapKit
 
 class MainBottomView: UIView {
-//    private let bottomView = UIView()
-    private let mapButton = UIButton()
-    private let cityListButton = UIButton()
+    let mapButton = UIButton()
+    let cityListButton = UIButton()
     
     init() {
         super.init(frame: .zero)
