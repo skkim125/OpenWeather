@@ -50,7 +50,7 @@ class CurrentWeatherView: UIStackView {
     
     func configureLayout() {
         cityNameLabel.snp.makeConstraints { make in
-            make.top.equalTo(self.snp.top).offset(40)
+            make.top.equalTo(self.snp.top)
             make.height.equalTo(60)
             make.centerX.equalTo(self.snp.centerX)
         }

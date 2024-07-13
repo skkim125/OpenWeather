@@ -50,6 +50,7 @@ class MainViewController: UIViewController {
         tv.rowHeight = 50
         tv.separatorColor = .gray
         tv.separatorInset = .zero
+        tv.allowsSelection = false
         
         return tv
     }()
@@ -73,6 +74,7 @@ class MainViewController: UIViewController {
         let image = #imageLiteral(resourceName: "gradationImg").cgImage
         view.layer.contents = image
         
+        configureNavigationBar()
         configureHierarchy()
         configureLayout()
         configureView()
@@ -94,6 +96,11 @@ class MainViewController: UIViewController {
             marker.title = self.viewModel.outputCity.value?.name ?? ""
             self.mapView.addAnnotation(marker)
         }
+    }
+    
+    func configureNavigationBar() {
+        navigationItem.largeTitleDisplayMode = .never
+        navigationController?.navigationBar.prefersLargeTitles = false
     }
     
     func configureHierarchy() {
@@ -190,6 +197,13 @@ class MainViewController: UIViewController {
 
         let vc = CityListViewController()
         vc.viewModel = self.viewModel
+        vc.moveData = { city, vm in
+            self.viewModel = vm
+            self.viewModel.inputCityID.value = city.id
+            self.bindData()
+            self.threeHoursCollectionView.reloadData()
+            self.fiveDaysViewTableView.reloadData()
+        }
         
         navigationController?.pushViewController(vc, animated: true)
     }

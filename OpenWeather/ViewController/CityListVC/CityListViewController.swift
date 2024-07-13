@@ -9,8 +9,6 @@ import UIKit
 import SnapKit
 
 class CityListViewController: UIViewController {
-    var viewModel: WeatherViewModel?
-    
     private lazy var cityListTableView: UITableView = {
         let tv = UITableView()
         tv.delegate = self
@@ -21,6 +19,16 @@ class CityListViewController: UIViewController {
         
         return tv
     }()
+    private lazy var searchBar: UISearchBar = {
+        let searchBar = UISearchBar()
+        searchBar.showsCancelButton = true
+        searchBar.searchBarStyle = .minimal
+        
+        return searchBar
+    }()
+    
+    var viewModel: WeatherViewModel?
+    var moveData: ((City, WeatherViewModel)->())?
     
     override func viewDidLoad() {
         super.viewDidLoad()
@@ -33,7 +41,10 @@ class CityListViewController: UIViewController {
     
     func configureNavigationBar() {
         navigationItem.title = "City List"
-        navigationController?.navigationBar.titleTextAttributes = [.foregroundColor: UIColor.white]
+        navigationController?.navigationBar.largeTitleTextAttributes = [.foregroundColor: UIColor.white]
+        navigationItem.largeTitleDisplayMode = .always
+        navigationController?.navigationBar.prefersLargeTitles = true
+        
         navigationController?.navigationBar.tintColor = .white
         
         navigationItem.leftBarButtonItem = UIBarButtonItem(image: UIImage(systemName: "chevron.backward"), style: .plain, target: self, action: #selector(backButtonClicked))
@@ -44,12 +55,20 @@ class CityListViewController: UIViewController {
     }
     
     func configureHierarchy() {
+        view.addSubview(searchBar)
         view.addSubview(cityListTableView)
     }
     
     func configureLayout() {
+        searchBar.snp.makeConstraints { make in
+            make.top.equalTo(view.safeAreaLayoutGuide).offset(10)
+            make.horizontalEdges.equalTo(view.safeAreaLayoutGuide)
+            make.height.equalTo(30)
+        }
+        
         cityListTableView.snp.makeConstraints { make in
-            make.edges.equalTo(view.safeAreaLayoutGuide)
+            make.top.equalTo(searchBar.snp.bottom).offset(10)
+            make.horizontalEdges.bottom.equalTo(view.safeAreaLayoutGuide)
         }
     }
 }
@@ -62,8 +81,32 @@ extension CityListViewController: UITableViewDelegate, UITableViewDataSource {
     func tableView(_ tableView: UITableView, cellForRowAt indexPath: IndexPath) -> UITableViewCell {
         let cell = tableView.dequeueReusableCell(withIdentifier: CityListTableViewCell.id, for: indexPath) as! CityListTableViewCell
         
-        cell.configureView()
+        if let data = viewModel?.inputCityList.value[indexPath.row] {
+            cell.configureView(city: data)
+        }
+        
+        cell.selectionStyle = .none
         
         return cell
+    }
+    
+    func tableView(_ tableView: UITableView, didSelectRowAt indexPath: IndexPath) {
+        if let data = viewModel?.inputCityList.value[indexPath.row] {
+            showAlert(city: data)
+        }
+    }
+    
+    func showAlert(city: City) {
+        let cancel = UIAlertAction(title: "취소", style: .destructive)
+        let pickCity = UIAlertAction(title: "확인", style: .default) { _ in
+            self.moveData?(city, self.viewModel!)
+            self.navigationController?.popViewController(animated: true)
+        }
+        
+        let alert = UIAlertController(title: "\(city.name)의 날씨로 이동하시겠습니까?", message: nil, preferredStyle: .alert)
+        alert.addAction(cancel)
+        alert.addAction(pickCity)
+        
+        present(alert, animated: true)
     }
 }

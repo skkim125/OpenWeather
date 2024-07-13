@@ -26,17 +26,17 @@ class WeatherViewModel {
     init() {
         
         fetchJson()
-        
-        if let id = inputCityID.value {
-            outputCityID.value = id
-        } else {
-            outputCityID.value = 1835847
+        inputCityID.bind { id in
+            if let id = id {
+                self.outputCityID.value = id
+            } else {
+                self.outputCityID.value = 1835847
+            }
         }
-        
-        print(outputCityID.value)
         
         outputCityID.bind { id in
             self.outputCity.value = self.inputCityList.value.filter({ $0.id == id }).first!
+            self.outputMapCoord.value = CLLocationCoordinate2D(latitude: self.outputCity.value?.coord.lat ?? 0.0, longitude: self.outputCity.value?.coord.lon ?? 0.0)
             self.callWeather(id: id)
         }
         

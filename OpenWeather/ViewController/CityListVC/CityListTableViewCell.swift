@@ -20,7 +20,6 @@ class CityListTableViewCell: UITableViewCell {
         
         configureHierarchy()
         configureLayout()
-        configureView()
     }
     
     func configureHierarchy() {
@@ -50,15 +49,15 @@ class CityListTableViewCell: UITableViewCell {
         }
     }
     
-    func configureView() {
+    func configureView(city: City) {
         hashImageView.contentMode = .scaleAspectFit
         hashImageView.tintColor = .white
         
-        cityNameLabel.text = "Seoul"
+        cityNameLabel.text = city.name
         cityNameLabel.textColor = .white
         cityNameLabel.font = .boldSystemFont(ofSize: 16)
         
-        countryLabel.text = "KR"
+        countryLabel.text = city.country
         countryLabel.textColor = .gray
         countryLabel.font = .boldSystemFont(ofSize: 14)
     }
