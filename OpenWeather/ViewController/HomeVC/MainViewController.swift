@@ -187,8 +187,9 @@ class MainViewController: UIViewController {
     }
     
     @objc func cityListButtonClicked() {
-        print("클릭")
+
         let vc = CityListViewController()
+        vc.viewModel = self.viewModel
         
         navigationController?.pushViewController(vc, animated: true)
     }

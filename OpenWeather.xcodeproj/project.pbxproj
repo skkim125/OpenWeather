@@ -13,6 +13,7 @@
 		0425CB882C42569200B94F4D /* CityList.json in Resources */ = {isa = PBXBuildFile; fileRef = 0425CB872C42569200B94F4D /* CityList.json */; };
 		0425CB8A2C4257B800B94F4D /* City.swift in Sources */ = {isa = PBXBuildFile; fileRef = 0425CB892C4257B800B94F4D /* City.swift */; };
 		0425CB8C2C4267AF00B94F4D /* CityListViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = 0425CB8B2C4267AF00B94F4D /* CityListViewController.swift */; };
+		0425CB902C426CA700B94F4D /* CityListTableViewCell.swift in Sources */ = {isa = PBXBuildFile; fileRef = 0425CB8F2C426CA700B94F4D /* CityListTableViewCell.swift */; };
 		04671F622C3FBDD700EF5C1B /* AppDelegate.swift in Sources */ = {isa = PBXBuildFile; fileRef = 04671F612C3FBDD700EF5C1B /* AppDelegate.swift */; };
 		04671F642C3FBDD700EF5C1B /* SceneDelegate.swift in Sources */ = {isa = PBXBuildFile; fileRef = 04671F632C3FBDD700EF5C1B /* SceneDelegate.swift */; };
 		04671F662C3FBDD700EF5C1B /* MainViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = 04671F652C3FBDD700EF5C1B /* MainViewController.swift */; };
@@ -41,6 +42,7 @@
 		0425CB872C42569200B94F4D /* CityList.json */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text.json; path = CityList.json; sourceTree = "<group>"; };
 		0425CB892C4257B800B94F4D /* City.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = City.swift; sourceTree = "<group>"; };
 		0425CB8B2C4267AF00B94F4D /* CityListViewController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = CityListViewController.swift; sourceTree = "<group>"; };
+		0425CB8F2C426CA700B94F4D /* CityListTableViewCell.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = CityListTableViewCell.swift; sourceTree = "<group>"; };
 		04671F5E2C3FBDD700EF5C1B /* OpenWeather.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = OpenWeather.app; sourceTree = BUILT_PRODUCTS_DIR; };
 		04671F612C3FBDD700EF5C1B /* AppDelegate.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AppDelegate.swift; sourceTree = "<group>"; };
 		04671F632C3FBDD700EF5C1B /* SceneDelegate.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SceneDelegate.swift; sourceTree = "<group>"; };
@@ -84,6 +86,25 @@
 				04671F962C410EB900EF5C1B /* DividerLine.swift */,
 			);
 			path = CustomView;
+			sourceTree = "<group>";
+		};
+		0425CB8D2C426C7300B94F4D /* HomeVC */ = {
+			isa = PBXGroup;
+			children = (
+				04671F652C3FBDD700EF5C1B /* MainViewController.swift */,
+				04671F982C4118D000EF5C1B /* ThreeHoursCollectionViewCell.swift */,
+				0425CB812C417C9A00B94F4D /* FiveDaysTableViewCell.swift */,
+			);
+			path = HomeVC;
+			sourceTree = "<group>";
+		};
+		0425CB8E2C426C8000B94F4D /* CityListVC */ = {
+			isa = PBXGroup;
+			children = (
+				0425CB8B2C4267AF00B94F4D /* CityListViewController.swift */,
+				0425CB8F2C426CA700B94F4D /* CityListTableViewCell.swift */,
+			);
+			path = CityListVC;
 			sourceTree = "<group>";
 		};
 		04671F552C3FBDD600EF5C1B = {
@@ -136,10 +157,8 @@
 		04671F822C3FD91100EF5C1B /* ViewController */ = {
 			isa = PBXGroup;
 			children = (
-				04671F652C3FBDD700EF5C1B /* MainViewController.swift */,
-				04671F982C4118D000EF5C1B /* ThreeHoursCollectionViewCell.swift */,
-				0425CB812C417C9A00B94F4D /* FiveDaysTableViewCell.swift */,
-				0425CB8B2C4267AF00B94F4D /* CityListViewController.swift */,
+				0425CB8D2C426C7300B94F4D /* HomeVC */,
+				0425CB8E2C426C8000B94F4D /* CityListVC */,
 			);
 			path = ViewController;
 			sourceTree = "<group>";
@@ -251,6 +270,7 @@
 				04671F862C3FDA0E00EF5C1B /* APIKey.swift in Sources */,
 				0425CB802C41664E00B94F4D /* CurrentWeatherView.swift in Sources */,
 				04671F992C4118D000EF5C1B /* ThreeHoursCollectionViewCell.swift in Sources */,
+				0425CB902C426CA700B94F4D /* CityListTableViewCell.swift in Sources */,
 				04671F8A2C40EAA500EF5C1B /* WeatherViewModel.swift in Sources */,
 				0425CB8C2C4267AF00B94F4D /* CityListViewController.swift in Sources */,
 			);
