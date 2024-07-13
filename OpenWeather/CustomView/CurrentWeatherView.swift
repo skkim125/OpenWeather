@@ -8,19 +8,45 @@
 import UIKit
 
 class CurrentWeatherView: UIStackView {
-    private let cityNameLabel = UILabel()
-    private let currentTemperatureLabel = UILabel()
-    private let weatherOverviewLabel = UILabel()
-    private let max_minTemperatureLabel = UILabel()
+    private let cityNameLabel = {
+        let label = UILabel()
+        label.textColor = .black.withAlphaComponent(0.8)
+        label.font = .systemFont(ofSize: 50)
+        label.textAlignment = .center
+        
+        return label
+    }()
+    private let currentTemperatureLabel = {
+        let label = UILabel()
+        label.textColor = .black.withAlphaComponent(0.8)
+        label.font = .systemFont(ofSize: 90)
+        label.textAlignment = .center
+        
+        return label
+    }()
+    private let weatherOverviewLabel = {
+        let label = UILabel()
+        label.textColor = .black.withAlphaComponent(0.8)
+        label.font = .systemFont(ofSize: 25)
+        label.textAlignment = .center
+        
+        return label
+    }()
+    private let max_minTemperatureLabel = {
+        let label = UILabel()
+        label.textColor = .black.withAlphaComponent(0.8)
+        label.font = .systemFont(ofSize: 20)
+        label.textAlignment = .center
+        
+        return label
+    }()
     
     init(viewModel: WeatherViewModel) {
         super.init(frame: .zero)
         
         configureHierarchy()
         configureLayout()
-        configureView()
         bindData(viewModel: viewModel)
-        
     }
     
     func bindData(viewModel: WeatherViewModel) {
@@ -41,14 +67,14 @@ class CurrentWeatherView: UIStackView {
         }
     }
     
-    func configureHierarchy() {
+    private func configureHierarchy() {
         addArrangedSubview(cityNameLabel)
         addArrangedSubview(currentTemperatureLabel)
         addArrangedSubview(weatherOverviewLabel)
         addArrangedSubview(max_minTemperatureLabel)
     }
     
-    func configureLayout() {
+    private func configureLayout() {
         cityNameLabel.snp.makeConstraints { make in
             make.top.equalTo(self.snp.top)
             make.height.equalTo(60)
@@ -71,24 +97,7 @@ class CurrentWeatherView: UIStackView {
         }
     }
     
-    func configureView() {
-        cityNameLabel.textColor = .black.withAlphaComponent(0.8)
-        cityNameLabel.font = .systemFont(ofSize: 50)
-        cityNameLabel.textAlignment = .center
-        
-        currentTemperatureLabel.textColor = .black.withAlphaComponent(0.8)
-        currentTemperatureLabel.font = .systemFont(ofSize: 90)
-        currentTemperatureLabel.textAlignment = .center
-        
-        weatherOverviewLabel.textColor = .black.withAlphaComponent(0.8)
-        weatherOverviewLabel.font = .systemFont(ofSize: 25)
-        weatherOverviewLabel.textAlignment = .center
-        
-        max_minTemperatureLabel.textColor = .black.withAlphaComponent(0.8)
-        max_minTemperatureLabel.font = .systemFont(ofSize: 20)
-        max_minTemperatureLabel.textAlignment = .center
-    }
-    
+    @available(*, unavailable)
     required init(coder: NSCoder) {
         fatalError("init(coder:) has not been implemented")
     }

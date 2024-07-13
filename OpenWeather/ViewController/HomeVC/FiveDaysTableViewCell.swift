@@ -80,11 +80,3 @@ class FiveDaysTableViewCell: UITableViewCell {
         fatalError("init(coder:) has not been implemented")
     }
 }
-
-extension String {
-    static func transTempStr(_ temp: Double) -> String {
-        let intTemp = Int(temp)
-        
-        return String(intTemp) + "º"
-    }
-}
