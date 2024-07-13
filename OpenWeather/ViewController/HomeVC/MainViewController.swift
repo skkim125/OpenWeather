@@ -16,7 +16,7 @@ class MainViewController: UIViewController {
     
     private let threeHoursView = WeatherDetailView(image: "calendar", title: "3시간 간격의 일기예보")
     private lazy var threeHoursCollectionView = {
-        let cv = UICollectionView(frame: .zero, collectionViewLayout: UICollectionViewLayout.threeHoursViewLayout())
+        let cv = UICollectionView(frame: .zero, collectionViewLayout: threeHoursViewLayout())
         cv.delegate = self
         cv.dataSource = self
         cv.register(ThreeHoursCollectionViewCell.self, forCellWithReuseIdentifier: ThreeHoursCollectionViewCell.id)
@@ -25,6 +25,20 @@ class MainViewController: UIViewController {
         
         return cv
     }()
+    func threeHoursViewLayout() -> UICollectionViewLayout {
+        let layout = UICollectionViewFlowLayout()
+        let cellSpacing: CGFloat = 10
+        let sectionSpacing: CGFloat = 5
+        layout.sectionInset = .init(top: sectionSpacing, left: 0, bottom: sectionSpacing, right: 0)
+        layout.minimumInteritemSpacing = cellSpacing
+        layout.minimumLineSpacing = sectionSpacing
+        layout.scrollDirection = .horizontal
+        
+        let width = UIScreen.main.bounds.width - (cellSpacing * 5)
+        layout.itemSize = CGSize(width: width/6, height: width/2.7)
+        
+        return layout
+    }
     
     private let fiveDaysView = WeatherDetailView(image: "calendar", title: "5일 간의 일기예보")
     private lazy var fiveDaysViewTableView: UITableView = {
@@ -52,9 +66,7 @@ class MainViewController: UIViewController {
     
     private let bottomView = MainBottomView()
     
-    
-    private let userdefaultsManager = UserDefaultsManager.shared
-    private var viewModel = WeatherViewModel()
+    var viewModel = WeatherViewModel()
     
     override func viewDidLoad() {
         super.viewDidLoad()
@@ -70,35 +82,28 @@ class MainViewController: UIViewController {
         bindData()
     }
     
-    private func bindData() {
-        self.viewModel.outputShowAlert.bind { show in
-            if show {
-                self.showAlert()
-            }
-        }
-        
-        self.viewModel.inputSubWeather.bind { data in
+    func bindData() {
+        self.viewModel.inputSubWeather.bind { _ in
             self.threeHoursCollectionView.reloadData()
             self.fiveDaysViewTableView.reloadData()
         }
         
         self.viewModel.outputMapCoord.bind { coord in
-            self.mapView.region = .init(center: coord ?? CLLocationCoordinate2D(latitude: 0.0, longitude: 0.0), latitudinalMeters: 20000, longitudinalMeters: 20000)
+            self.mapView.region = .init(center: coord, latitudinalMeters: 20000, longitudinalMeters: 20000)
             
             let marker = MKPointAnnotation()
-            marker.coordinate = coord ?? CLLocationCoordinate2D(latitude: 0.0, longitude: 0.0)
-            
+            marker.coordinate = coord
             marker.title = self.viewModel.outputCity.value?.name ?? ""
             self.mapView.addAnnotation(marker)
         }
     }
     
-    private func configureNavigationBar() {
+    func configureNavigationBar() {
         navigationItem.largeTitleDisplayMode = .never
         navigationController?.navigationBar.prefersLargeTitles = false
     }
     
-    private func configureHierarchy() {
+    func configureHierarchy() {
         view.addSubview(scrollView)
         
         scrollView.addSubview(currentWeatherView)
@@ -117,7 +122,7 @@ class MainViewController: UIViewController {
     }
     
     
-    private func configureLayout() {
+    func configureLayout() {
         
         scrollView.snp.makeConstraints { make in
             make.top.horizontalEdges.equalTo(view.safeAreaLayoutGuide)
@@ -174,7 +179,7 @@ class MainViewController: UIViewController {
         }
     }
     
-    private func configureView() {
+    func configureView() {
         scrollView.showsVerticalScrollIndicator = true
         
         currentWeatherView.axis = .vertical
@@ -188,29 +193,19 @@ class MainViewController: UIViewController {
         bottomView.cityListButton.addTarget(self, action: #selector(cityListButtonClicked), for: .touchUpInside)
     }
     
-    @objc private func cityListButtonClicked() {
+    @objc func cityListButtonClicked() {
+
         let vc = CityListViewController()
-        
         vc.viewModel = self.viewModel
         vc.moveData = { city, vm in
             self.viewModel = vm
             self.viewModel.inputCityID.value = city.id
-            self.userdefaultsManager.saveID = city.id
             self.bindData()
             self.threeHoursCollectionView.reloadData()
             self.fiveDaysViewTableView.reloadData()
         }
         
         navigationController?.pushViewController(vc, animated: true)
-    }
-    
-    private func showAlert() {
-        let alert = UIAlertController(title: "네트워크 연결 실패", message: "잠시 후 다시 시도해주세요", preferredStyle: .alert)
-        let back = UIAlertAction(title: "확인", style: .default)
-        
-        alert.addAction(back)
-        
-        present(alert, animated: true)
     }
 }
 

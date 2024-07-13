@@ -20,12 +20,12 @@ class MainBottomView: UIView {
         configureView()
     }
     
-    private func configureHierarchy() {
+    func configureHierarchy() {
         addSubview(mapButton)
         addSubview(cityListButton)
     }
     
-    private func configureLayout() {
+    func configureLayout() {
         mapButton.snp.makeConstraints { make in
             make.top.equalTo(safeAreaLayoutGuide)
             make.leading.equalTo(safeAreaLayoutGuide).inset(10)
@@ -39,7 +39,7 @@ class MainBottomView: UIView {
         }
     }
     
-    private func configureView() {
+    func configureView() {
         mapButton.setImage(UIImage(systemName: "map"), for: .normal)
         mapButton.tintColor = .black
         
@@ -47,7 +47,6 @@ class MainBottomView: UIView {
         cityListButton.tintColor = .black
     }
     
-    @available(*, unavailable)
     required init?(coder: NSCoder) {
         fatalError("init(coder:) has not been implemented")
     }

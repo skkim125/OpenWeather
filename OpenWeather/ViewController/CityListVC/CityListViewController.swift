@@ -39,7 +39,7 @@ class CityListViewController: UIViewController {
         configureLayout()
     }
     
-    private func configureNavigationBar() {
+    func configureNavigationBar() {
         navigationItem.title = "City List"
         navigationController?.navigationBar.largeTitleTextAttributes = [.foregroundColor: UIColor.white]
         navigationItem.largeTitleDisplayMode = .always
@@ -50,16 +50,16 @@ class CityListViewController: UIViewController {
         navigationItem.leftBarButtonItem = UIBarButtonItem(image: UIImage(systemName: "chevron.backward"), style: .plain, target: self, action: #selector(backButtonClicked))
     }
     
-    @objc private func backButtonClicked() {
+    @objc func backButtonClicked() {
         navigationController?.popViewController(animated: true)
     }
     
-    private func configureHierarchy() {
+    func configureHierarchy() {
         view.addSubview(searchBar)
         view.addSubview(cityListTableView)
     }
     
-    private func configureLayout() {
+    func configureLayout() {
         searchBar.snp.makeConstraints { make in
             make.top.equalTo(view.safeAreaLayoutGuide).offset(10)
             make.horizontalEdges.equalTo(view.safeAreaLayoutGuide)
@@ -70,20 +70,6 @@ class CityListViewController: UIViewController {
             make.top.equalTo(searchBar.snp.bottom).offset(10)
             make.horizontalEdges.bottom.equalTo(view.safeAreaLayoutGuide)
         }
-    }
-    
-    private func showAlert(city: City) {
-        let cancel = UIAlertAction(title: "취소", style: .destructive)
-        let pickCity = UIAlertAction(title: "확인", style: .default) { _ in
-            self.moveData?(city, self.viewModel!)
-            self.navigationController?.popViewController(animated: true)
-        }
-        
-        let alert = UIAlertController(title: "\(city.name)의 날씨로 이동하시겠습니까?", message: nil, preferredStyle: .alert)
-        alert.addAction(cancel)
-        alert.addAction(pickCity)
-        
-        present(alert, animated: true)
     }
 }
 
@@ -108,5 +94,19 @@ extension CityListViewController: UITableViewDelegate, UITableViewDataSource {
         if let data = viewModel?.inputCityList.value[indexPath.row] {
             showAlert(city: data)
         }
+    }
+    
+    func showAlert(city: City) {
+        let cancel = UIAlertAction(title: "취소", style: .destructive)
+        let pickCity = UIAlertAction(title: "확인", style: .default) { _ in
+            self.moveData?(city, self.viewModel!)
+            self.navigationController?.popViewController(animated: true)
+        }
+        
+        let alert = UIAlertController(title: "\(city.name)의 날씨로 이동하시겠습니까?", message: nil, preferredStyle: .alert)
+        alert.addAction(cancel)
+        alert.addAction(pickCity)
+        
+        present(alert, animated: true)
     }
 }
