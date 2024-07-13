@@ -19,7 +19,6 @@ class FiveDaysTableViewCell: UITableViewCell {
         super.init(style: style, reuseIdentifier: reuseIdentifier)
         
         self.backgroundColor = .clear
-        print(#function)
         configureHierarchy()
         configureLayout()
     }
@@ -67,6 +66,7 @@ class FiveDaysTableViewCell: UITableViewCell {
         dayWeatherImageView.contentMode = .scaleAspectFit
         
         minTempLabel.text = "최저" + String.transTempStr(weather.weatherDetail.temp_min)
+        minTempLabel.textColor = .darkGray
         minTempLabel.font = .boldSystemFont(ofSize: 20)
         minTempLabel.textAlignment = .center
         

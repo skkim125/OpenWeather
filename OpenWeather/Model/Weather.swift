@@ -52,9 +52,14 @@ struct Weather: Decodable {
     }
 }
 
+struct Coord: Decodable {
+    let lat: Double
+    let lon: Double
+}
+
 struct SubWeather: Decodable {
     let result: [Weather]
-    let city: City
+    let city: OWCity
     
     var rangeOfTomorrow: [Weather] {
         let first = result[result.startIndex]
@@ -83,8 +88,9 @@ struct SubWeather: Decodable {
     }
 }
 
-struct City: Decodable {
+struct OWCity: Decodable {
     let name: String
+    let coord: Coord
 }
 
 struct WeatherDetail: Decodable {

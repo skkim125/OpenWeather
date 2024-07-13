@@ -20,11 +20,12 @@ class CurrentWeatherView: UIStackView {
         configureLayout()
         configureView()
         bindData(viewModel: viewModel)
+        
     }
     
     func bindData(viewModel: WeatherViewModel) {
-        viewModel.outputCityName.bind { city in
-            self.cityNameLabel.text = city
+        viewModel.outputCity.bind { city in
+            self.cityNameLabel.text = city?.name ?? ""
         }
         
         viewModel.outputCurrentTemperature.bind { ct in

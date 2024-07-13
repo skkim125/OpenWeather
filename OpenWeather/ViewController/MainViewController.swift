@@ -55,7 +55,13 @@ class MainViewController: UIViewController {
     }()
     
     private let currentLocationView = WeatherDetailView(image: "mappin.and.ellipse", title: "위치")
-    private let mapView = MKMapView()
+    private let mapView = {
+        let map = MKMapView()
+        map.isScrollEnabled = false
+        map.isRotateEnabled = false
+        
+        return map
+    }()
     
     private let bottomView = MainBottomView()
     
@@ -75,11 +81,18 @@ class MainViewController: UIViewController {
     }
     
     func bindData() {
-        viewModel.inputCoordinate.value = (37.5665, 126.9780)
-        
-        viewModel.inputSubWeather.bind { _ in
+        self.viewModel.inputSubWeather.bind { _ in
             self.threeHoursCollectionView.reloadData()
             self.fiveDaysViewTableView.reloadData()
+        }
+        
+        self.viewModel.outputMapCoord.bind { coord in
+            self.mapView.region = .init(center: coord, latitudinalMeters: 20000, longitudinalMeters: 20000)
+            
+            let marker = MKPointAnnotation()
+            marker.coordinate = coord
+            marker.title = self.viewModel.outputCity.value?.name ?? ""
+            self.mapView.addAnnotation(marker)
         }
     }
     
