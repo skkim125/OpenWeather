@@ -35,7 +35,7 @@ class FiveDaysTableViewCell: UITableViewCell {
             make.leading.equalTo(contentView.safeAreaLayoutGuide).offset(10)
             make.centerY.equalTo(contentView)
             make.height.equalTo(30)
-            make.width.equalTo(20)
+            make.width.equalTo(40)
         }
         
         maxTempLabel.snp.makeConstraints { make in
@@ -58,20 +58,20 @@ class FiveDaysTableViewCell: UITableViewCell {
         }
     }
     
-    func configureView(weather: Weather) {
-        daysLabel.text = weather.dayOfWeek
+    func configureView(minWeather: Weather, maxWeather: Weather) {
+        daysLabel.text = minWeather.dayOfWeek
         daysLabel.font = .boldSystemFont(ofSize: 20)
         
-        dayWeatherImageView.kf.setImage(with: URL(string: weather.weatherImageURL))
+        dayWeatherImageView.kf.setImage(with: URL(string: maxWeather.weatherImageURL))
         dayWeatherImageView.contentMode = .scaleAspectFit
         
-        minTempLabel.text = "최저" + String.transTempStr(weather.weatherDetail.temp_min)
+        minTempLabel.text = "최저" + String.transTempStr(minWeather.weatherDetail.temp_min)
         minTempLabel.textColor = .darkGray
         minTempLabel.font = .boldSystemFont(ofSize: 20)
         minTempLabel.textAlignment = .center
         
         
-        maxTempLabel.text = "최고" + String.transTempStr(weather.weatherDetail.temp_max)
+        maxTempLabel.text = "최고" + String.transTempStr(maxWeather.weatherDetail.temp_max)
         maxTempLabel.font = .boldSystemFont(ofSize: 20)
         maxTempLabel.textAlignment = .right
     }

@@ -28,7 +28,9 @@ class WeatherViewModel {
     var outputHumidity: Observable<String?> = Observable(nil)
     var outputMapCoord: Observable<CLLocationCoordinate2D?> = Observable(CLLocationCoordinate2D(latitude: 0.0, longitude: 0.0))
     var outputShowAlert: Observable<Bool> = Observable(false)
- 
+    var outputFiveDays: Observable<[String]> = Observable([])
+    var outputMinMaxTempOfDay: Observable<[String: (Weather, Weather)]> = Observable([:])
+    
     init() {
         
         fetchJson()
@@ -77,6 +79,8 @@ class WeatherViewModel {
                 self.inputSubWeather.value = data
                 self.outputMapCoord.value = CLLocationCoordinate2D(latitude: data.city.coord.lat, longitude: data.city.coord.lon)
                 self.outputShowAlert.value = false
+                self.addMinMaxTemp(data: data)
+                self.outputFiveDays.value = self.mappingFiveDays(fiveDays: data.fiveDays)
             } else {
                 self.outputShowAlert.value = true
             }
@@ -95,5 +99,28 @@ class WeatherViewModel {
            let cities = try? decoder.decode([City].self, from: data) {
             inputCityList.value = cities
         }
+    }
+    
+    private func addMinMaxTemp(data: SubWeather) {
+        for weather in data.fiveDays {
+            let day = weather.day
+            print(#function, day)
+            
+            let tempMin = weather.weatherDetail.temp_min
+            let tempMax = weather.weatherDetail.temp_max
+            if let value = outputMinMaxTempOfDay.value[day] {
+                let minWeather = (tempMin < value.0.weatherDetail.temp_min) ? weather : value.0
+                let maxWeather = (tempMax > value.1.weatherDetail.temp_max) ? weather : value.1
+                
+                outputMinMaxTempOfDay.value[day] = (minWeather, maxWeather)
+            } else {
+                outputMinMaxTempOfDay.value[day] = (weather, weather)
+            }
+        }
+    }
+    
+    func mappingFiveDays(fiveDays: [Weather]) -> [String] {
+        let mapping = fiveDays.map({ $0.day })
+        return Array(Set(mapping)).sorted(by: { $0 < $1 })
     }
 }

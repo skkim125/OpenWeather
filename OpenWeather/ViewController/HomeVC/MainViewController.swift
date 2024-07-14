@@ -89,10 +89,15 @@ class MainViewController: UIViewController {
             }
         }
         
-        self.viewModel.inputSubWeather.bind { data in
+        self.viewModel.inputSubWeather.bind { _ in
             self.threeHoursCollectionView.reloadData()
             self.fiveDaysViewTableView.reloadData()
-            self.weatherDeatailCollectionView.reloadData()
+        }
+        
+        self.viewModel.outputFiveDays.bind { _ in
+            self.viewModel.outputMinMaxTempOfDay.bind { _ in
+                self.fiveDaysViewTableView.reloadData()
+            }
         }
         
         self.viewModel.outputMapCoord.bind { coord in
@@ -109,6 +114,10 @@ class MainViewController: UIViewController {
     private func configureNavigationBar() {
         navigationItem.largeTitleDisplayMode = .never
         navigationController?.navigationBar.prefersLargeTitles = false
+    }
+    
+    override func viewWillAppear(_ animated: Bool) {
+        navigationController?.isNavigationBarHidden = true
     }
     
     private func configureHierarchy() {
@@ -131,11 +140,11 @@ class MainViewController: UIViewController {
         view.addSubview(bottomView)
     }
     
-    
     private func configureLayout() {
         
         scrollView.snp.makeConstraints { make in
-            make.top.horizontalEdges.equalTo(view.safeAreaLayoutGuide)
+            make.top.equalTo(view.safeAreaLayoutGuide).offset(30)
+            make.horizontalEdges.equalTo(view.safeAreaLayoutGuide)
         }
         
         currentWeatherView.snp.makeConstraints { make in
@@ -217,6 +226,7 @@ class MainViewController: UIViewController {
             self.viewModel.inputCityID.value = city.id
             self.userdefaultsManager.savedID = city.id
             self.bindData()
+            self.scrollView.contentOffset = CGPoint(x: 0, y: 0)
             self.threeHoursCollectionView.reloadData()
             self.fiveDaysViewTableView.reloadData()
         }
@@ -273,16 +283,15 @@ extension MainViewController: UICollectionViewDelegate, UICollectionViewDataSour
 
 extension MainViewController: UITableViewDelegate, UITableViewDataSource {
     func tableView(_ tableView: UITableView, numberOfRowsInSection section: Int) -> Int {
-        return viewModel.inputSubWeather.value?.fiveDays.count ?? 0
+        return viewModel.outputFiveDays.value.count
     }
     
     func tableView(_ tableView: UITableView, cellForRowAt indexPath: IndexPath) -> UITableViewCell {
         guard let cell = tableView.dequeueReusableCell(withIdentifier: FiveDaysTableViewCell.id, for: indexPath) as? FiveDaysTableViewCell else { return UITableViewCell() }
-        
-        if let data = viewModel.inputSubWeather.value {
-            cell.configureView(weather: data.fiveDays[indexPath.row])
+        let day = viewModel.outputFiveDays.value[indexPath.row]
+        if let data = viewModel.outputMinMaxTempOfDay.value[day] {
+            cell.configureView(minWeather: data.0, maxWeather: data.1)
         }
-        
         return cell
     }
 }

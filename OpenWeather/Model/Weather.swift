@@ -28,6 +28,9 @@ struct Weather: Decodable {
         formatter.dateFormat = "E"
         
         let date = Date(timeIntervalSince1970: TimeInterval(self.dt))
+        let startToday = Calendar.current.startOfDay(for: Date())
+        let endToday = Calendar.current.startOfDay(for: Date(timeIntervalSince1970: TimeInterval(Date().addingTimeInterval(86399).timeIntervalSince1970)))
+        
         return formatter.string(from: date)
     }
     
@@ -44,11 +47,11 @@ struct Weather: Decodable {
     }
     
     enum CodingKeys: String, CodingKey {
-        case dt = "dt"
+        case dt
         case weatherDetail = "main"
         case weatherImage = "weather"
-        case wind = "wind"
-        case clouds = "clouds"
+        case wind
+        case clouds
     }
 }
 
@@ -76,15 +79,19 @@ struct SubWeather: Decodable {
             let fiveDays = Date().addingTimeInterval(86400 * 5).timeIntervalSince1970
             return TimeInterval(date.dt) <= fiveDays
         }).filter({ date in
-            Date(timeIntervalSince1970: TimeInterval(date.dt)).timeIntervalSince1970 == Calendar.current.startOfDay(for: Date(timeIntervalSince1970: TimeInterval(date.dt))).timeIntervalSince1970
+            let day = Date(timeIntervalSince1970: TimeInterval(date.dt)).timeIntervalSince1970
+            let startDay = Calendar.current.startOfDay(for: Date(timeIntervalSince1970: TimeInterval(date.dt))).timeIntervalSince1970
+            let endDay = Calendar.current.startOfDay(for: Date(timeIntervalSince1970: TimeInterval(date.dt))).addingTimeInterval(86399).timeIntervalSince1970
+            
+            return day >= startDay && day <= endDay
         })
-        
+
         return fiveDaysArray
     }
     
     enum CodingKeys: String, CodingKey {
         case result = "list"
-        case city = "city"
+        case city
     }
 }
 

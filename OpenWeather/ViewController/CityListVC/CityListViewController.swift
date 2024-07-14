@@ -44,6 +44,7 @@ class CityListViewController: UIViewController {
         navigationController?.navigationBar.largeTitleTextAttributes = [.foregroundColor: UIColor.white]
         navigationItem.largeTitleDisplayMode = .always
         navigationController?.navigationBar.prefersLargeTitles = true
+        navigationController?.isNavigationBarHidden = false
         
         navigationController?.navigationBar.tintColor = .white
         
