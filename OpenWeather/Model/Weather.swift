@@ -98,8 +98,8 @@ struct WeatherDetail: Decodable {
     let feels_like: Double
     let temp_min: Double
     let temp_max: Double
-    let pressure: Double
-    let humidity: Double
+    let pressure: Int
+    let humidity: Int
     
     var tempStr: String {
         "\(self.temp)" + "º"

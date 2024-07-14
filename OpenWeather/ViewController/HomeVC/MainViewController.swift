@@ -16,7 +16,9 @@ class MainViewController: UIViewController {
     
     private let threeHoursView = WeatherDetailView(image: "calendar", title: "3시간 간격의 일기예보")
     private lazy var threeHoursCollectionView = {
-        let cv = UICollectionView(frame: .zero, collectionViewLayout: UICollectionViewLayout.threeHoursViewLayout())
+        let layout = UICollectionViewFlowLayout()
+        layout.scrollDirection = .horizontal
+        let cv = UICollectionView(frame: .zero, collectionViewLayout: layout)
         cv.delegate = self
         cv.dataSource = self
         cv.register(ThreeHoursCollectionViewCell.self, forCellWithReuseIdentifier: ThreeHoursCollectionViewCell.id)
@@ -25,21 +27,6 @@ class MainViewController: UIViewController {
         
         return cv
     }()
-    func threeHoursViewLayout() -> UICollectionViewLayout {
-        let layout = UICollectionViewFlowLayout()
-        let cellSpacing: CGFloat = 10
-        let sectionSpacing: CGFloat = 5
-        layout.sectionInset = .init(top: sectionSpacing, left: 0, bottom: sectionSpacing, right: 0)
-        layout.minimumInteritemSpacing = cellSpacing
-        layout.minimumLineSpacing = sectionSpacing
-        layout.scrollDirection = .horizontal
-        
-        let width = UIScreen.main.bounds.width - (cellSpacing * 5)
-        layout.itemSize = CGSize(width: width/6, height: width/2.7)
-        
-        return layout
-    }
-    
     private let fiveDaysView = WeatherDetailView(image: "calendar", title: "5일 간의 일기예보")
     private lazy var fiveDaysViewTableView: UITableView = {
         let tv = UITableView()
@@ -54,7 +41,6 @@ class MainViewController: UIViewController {
         
         return tv
     }()
-    
     private let currentLocationView = WeatherDetailView(image: "mappin.and.ellipse", title: "위치")
     private let mapView = {
         let map = MKMapView()
@@ -63,7 +49,20 @@ class MainViewController: UIViewController {
         
         return map
     }()
-    
+    private lazy var weatherDeatailCollectionView = {
+        let layout = UICollectionViewFlowLayout()
+        layout.sectionInset = .init(top: 0, left: 0, bottom: 10, right: 0)
+        let cv = UICollectionView(frame: .zero, collectionViewLayout: layout)
+        cv.delegate = self
+        cv.dataSource = self
+        cv.register(WeatherDetailCollectionViewCell.self, forCellWithReuseIdentifier: WeatherDetailCollectionViewCell.id)
+        cv.backgroundColor = .clear
+        cv.showsHorizontalScrollIndicator = false
+        cv.isScrollEnabled = false
+        cv.layer.cornerRadius = 12
+        
+        return cv
+    }()
     private let bottomView = MainBottomView()
     
     private let userdefaultsManager = UserDefaultsManager.shared
@@ -93,6 +92,7 @@ class MainViewController: UIViewController {
         self.viewModel.inputSubWeather.bind { data in
             self.threeHoursCollectionView.reloadData()
             self.fiveDaysViewTableView.reloadData()
+            self.weatherDeatailCollectionView.reloadData()
         }
         
         self.viewModel.outputMapCoord.bind { coord in
@@ -125,6 +125,8 @@ class MainViewController: UIViewController {
         
         tableStackView.addArrangedSubview(currentLocationView)
         currentLocationView.addSubview(mapView)
+        
+        tableStackView.addArrangedSubview(weatherDeatailCollectionView)
         
         view.addSubview(bottomView)
     }
@@ -167,6 +169,11 @@ class MainViewController: UIViewController {
             make.top.equalTo(fiveDaysView.divider.snp.bottom)
             make.horizontalEdges.equalTo(fiveDaysView.snp.horizontalEdges).inset(20)
             make.bottom.equalTo(fiveDaysView.snp.bottom).inset(10)
+        }
+        
+        weatherDeatailCollectionView.snp.makeConstraints { make in
+            make.horizontalEdges.equalTo(view.safeAreaLayoutGuide).inset(20)
+            make.height.equalTo(350)
         }
         
         currentLocationView.snp.makeConstraints { make in
@@ -216,32 +223,51 @@ class MainViewController: UIViewController {
         
         navigationController?.pushViewController(vc, animated: true)
     }
-    
-    private func showAlert() {
-        let alert = UIAlertController(title: "네트워크 연결 실패", message: "잠시 후 다시 시도해주세요", preferredStyle: .alert)
-        let back = UIAlertAction(title: "확인", style: .default)
-        
-        alert.addAction(back)
-        
-        present(alert, animated: true)
-    }
 }
 
-extension MainViewController: UICollectionViewDelegate, UICollectionViewDataSource {
+extension MainViewController: UICollectionViewDelegate, UICollectionViewDataSource, UICollectionViewDelegateFlowLayout {
+    
+    func collectionView(_ collectionView: UICollectionView, layout collectionViewLayout: UICollectionViewLayout, sizeForItemAt indexPath: IndexPath) -> CGSize {
+        
+        if collectionView == threeHoursCollectionView {
+            let width = collectionView.bounds.width - 20
+            return CGSize(width: width/5, height: width/2.3)
+        } else {
+            let width = collectionView.bounds.width - 20
+            return CGSize(width: width/2, height: width/2)
+        }
+    }
+    
     func collectionView(_ collectionView: UICollectionView, numberOfItemsInSection section: Int) -> Int {
-
-        return viewModel.inputSubWeather.value?.rangeOfTomorrow.count ?? 0
+        if collectionView == threeHoursCollectionView {
+            return viewModel.inputSubWeather.value?.rangeOfTomorrow.count ?? 0
+        } else {
+            return WeatherDetailType.allCases.count
+        }
     }
     
     func collectionView(_ collectionView: UICollectionView, cellForItemAt indexPath: IndexPath) -> UICollectionViewCell {
-        guard let cell = collectionView.dequeueReusableCell(withReuseIdentifier: ThreeHoursCollectionViewCell.id, for: indexPath) as? ThreeHoursCollectionViewCell else { return UICollectionViewCell() }
-        
-        if let data = viewModel.inputSubWeather.value {
-            cell.backgroundColor = .clear
-            cell.configureView(subWeather: data.result[indexPath.row])
+        if collectionView == threeHoursCollectionView {
+            guard let cell = collectionView.dequeueReusableCell(withReuseIdentifier: ThreeHoursCollectionViewCell.id, for: indexPath) as? ThreeHoursCollectionViewCell else { return UICollectionViewCell() }
+            
+            if let data = viewModel.inputSubWeather.value {
+                cell.backgroundColor = .clear
+                cell.configureView(subWeather: data.result[indexPath.row])
+            }
+            
+            return cell
+        } else {
+            guard let cell = collectionView.dequeueReusableCell(withReuseIdentifier: WeatherDetailCollectionViewCell.id, for: indexPath) as? WeatherDetailCollectionViewCell else { return UICollectionViewCell() }
+            
+            let data = WeatherDetailType.allCases[indexPath.row]
+            cell.configureView(type: data, viewModel: viewModel)
+            cell.backgroundColor = .lightGray.withAlphaComponent(0.3)
+            cell.layer.cornerRadius = 12
+            cell.clipsToBounds = true
+            
+            return cell
+
         }
-        
-        return cell
     }
 }
 

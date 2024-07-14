@@ -22,6 +22,10 @@ class WeatherViewModel {
     var outputCurrentTemperature: Observable<String?> = Observable(nil)
     var outputMaxAndMinTemperature: Observable<String?> = Observable(nil)
     var outputWeatherOverview: Observable<String?> = Observable(nil)
+    var outputWindSpeed: Observable<String?> = Observable(nil)
+    var outputCloudy: Observable<String?> = Observable(nil)
+    var outputPressure: Observable<String?> = Observable(nil)
+    var outputHumidity: Observable<String?> = Observable(nil)
     var outputMapCoord: Observable<CLLocationCoordinate2D?> = Observable(CLLocationCoordinate2D(latitude: 0.0, longitude: 0.0))
     var outputShowAlert: Observable<Bool> = Observable(false)
  
@@ -50,6 +54,11 @@ class WeatherViewModel {
             self.outputMaxAndMinTemperature.value = current?.weatherDetail.maxminTempStr ?? "최고: --º | 최저: --º"
             
             self.outputWeatherOverview.value = current?.weatherImage.first?.description ?? "--"
+            
+            self.outputWindSpeed.value = String(format: "%.2f", current?.wind.speed ?? 0.0) + "m/s"
+            self.outputCloudy.value = "\(Int(current?.clouds.all ?? 0.0))" + "%"
+            self.outputPressure.value = NumberFormatter.localizedString(from: (current?.weatherDetail.pressure ?? 0) as NSNumber, number: .decimal) + "hpa"
+            self.outputHumidity.value = NumberFormatter.localizedString(from: (current?.weatherDetail.humidity ?? 0) as NSNumber, number: .decimal) + "%"
         }
     }
     
