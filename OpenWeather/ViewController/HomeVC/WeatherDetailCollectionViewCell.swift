@@ -8,7 +8,7 @@
 import UIKit
 import SnapKit
 
-class WeatherDetailCollectionViewCell: UICollectionViewCell {
+final class WeatherDetailCollectionViewCell: UICollectionViewCell {
     private let detailImageView = {
         let imageView = UIImageView()
         imageView.contentMode = .scaleAspectFit

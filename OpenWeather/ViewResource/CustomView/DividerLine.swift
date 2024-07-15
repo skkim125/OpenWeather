@@ -8,7 +8,7 @@
 import UIKit
 import SnapKit
 
-class DividerLine: UIView {
+final class DividerLine: UIView {
     
     init(color: UIColor) {
         super.init(frame: .zero)

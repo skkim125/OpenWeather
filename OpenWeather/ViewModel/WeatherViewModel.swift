@@ -8,7 +8,7 @@
 import Foundation
 import MapKit
 
-class WeatherViewModel {
+final class WeatherViewModel {
     private let owManager = OpenWeatherManager.shared
     private let userdefaultsManager = UserDefaultsManager.shared
     
@@ -52,8 +52,12 @@ class WeatherViewModel {
         
         inputCurrentWeather.bind { current in
             self.outputCurrentTemperature.value = current?.weatherDetail.tempStr ?? "--º"
-            
-            self.outputMaxAndMinTemperature.value = current?.weatherDetail.maxminTempStr ?? "최고: --º | 최저: --º"
+            if let day = current?.day {
+                let cwMinTemp: String? = String(self.outputMinMaxTempOfDay.value[day]?.0.weatherDetail.temp_min ?? 0.0)
+                let cwMaxTemp: String? = String(self.outputMinMaxTempOfDay.value[day]?.1.weatherDetail.temp_max ?? 0.0)
+                
+                self.outputMaxAndMinTemperature.value = "최고: \(cwMaxTemp ?? "--")º | 최저: \(cwMinTemp ?? "--")º"
+            }
             
             self.outputWeatherOverview.value = current?.weatherImage.first?.description ?? "--"
             
@@ -65,24 +69,35 @@ class WeatherViewModel {
     }
     
     private func callWeather(id: Int) {
-        self.owManager.callRequest(api: .currentURL(id), requestAPIType: Weather.self) { data in
-            if let data = data {
-                self.inputCurrentWeather.value = data
-                self.outputShowAlert.value = false
-            } else {
-                self.outputShowAlert.value = true
+        let group = DispatchGroup()
+        
+        group.enter()
+        DispatchQueue.global().async {
+            self.owManager.callRequest(api: .currentURL(id), requestAPIType: Weather.self) { data in
+                if let data = data {
+                    self.inputCurrentWeather.value = data
+                    self.outputShowAlert.value = false
+                } else {
+                    self.outputShowAlert.value = true
+                }
             }
+            group.leave()
         }
         
-        self.owManager.callRequest(api: .subWeatherURL(id), requestAPIType: SubWeather.self) { data in
-            if let data = data {
-                self.inputSubWeather.value = data
-                self.outputMapCoord.value = CLLocationCoordinate2D(latitude: data.city.coord.lat, longitude: data.city.coord.lon)
-                self.outputShowAlert.value = false
-                self.addMinMaxTemp(data: data)
-                self.outputFiveDays.value = self.mappingFiveDays(fiveDays: data.fiveDays)
-            } else {
-                self.outputShowAlert.value = true
+        group.enter()
+        DispatchQueue.global().async {
+            self.owManager.callRequest(api: .subWeatherURL(id), requestAPIType: SubWeather.self) { data in
+                if let data = data {
+                    self.inputSubWeather.value = data
+                    self.outputMapCoord.value = CLLocationCoordinate2D(latitude: data.city.coord.lat, longitude: data.city.coord.lon)
+                    self.outputShowAlert.value = false
+                    self.addMinMaxTemp(data: data)
+                    self.outputFiveDays.value = self.mappingFiveDays(fiveDays: data.fiveDays)
+                } else {
+                    self.outputShowAlert.value = true
+                }
+                
+                group.leave()
             }
         }
     }

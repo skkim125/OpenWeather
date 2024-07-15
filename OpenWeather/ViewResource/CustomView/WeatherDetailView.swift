@@ -8,7 +8,7 @@
 import UIKit
 import SnapKit
 
-class WeatherDetailView: UIView {
+final class WeatherDetailView: UIView {
     private let titleImageView = UIImageView()
     private let titleLabel = UILabel()
     let divider = DividerLine(color: .gray)

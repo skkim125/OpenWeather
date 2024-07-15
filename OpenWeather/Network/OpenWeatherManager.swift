@@ -8,7 +8,7 @@
 import Foundation
 import Alamofire
 
-class OpenWeatherManager {
+final class OpenWeatherManager {
     static let shared = OpenWeatherManager()
     private init() { }
     

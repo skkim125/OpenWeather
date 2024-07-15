@@ -9,7 +9,7 @@ import UIKit
 import Kingfisher
 import SnapKit
 
-class FiveDaysTableViewCell: UITableViewCell {
+final class FiveDaysTableViewCell: UITableViewCell {
     private let daysLabel = UILabel()
     private let dayWeatherImageView = UIImageView()
     private let minTempLabel = UILabel()

@@ -8,7 +8,7 @@
 import UIKit
 import SnapKit
 
-class MainBottomView: UIView {
+final class MainBottomView: UIView {
     private let mapButton = UIButton()
     let cityListButton = UIButton()
     

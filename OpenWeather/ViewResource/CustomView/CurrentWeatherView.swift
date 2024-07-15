@@ -7,11 +7,11 @@
 
 import UIKit
 
-class CurrentWeatherView: UIStackView {
+final class CurrentWeatherView: UIStackView {
     private let cityNameLabel = {
         let label = UILabel()
         label.textColor = .black.withAlphaComponent(0.8)
-        label.font = .systemFont(ofSize: 50)
+        label.font = .systemFont(ofSize: 45)
         label.textAlignment = .center
         
         return label
@@ -19,7 +19,7 @@ class CurrentWeatherView: UIStackView {
     private let currentTemperatureLabel = {
         let label = UILabel()
         label.textColor = .black.withAlphaComponent(0.8)
-        label.font = .systemFont(ofSize: 90)
+        label.font = .systemFont(ofSize: 80)
         label.textAlignment = .center
         
         return label

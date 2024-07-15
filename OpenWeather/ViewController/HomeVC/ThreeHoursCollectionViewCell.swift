@@ -9,7 +9,7 @@ import UIKit
 import Kingfisher
 import SnapKit
 
-class ThreeHoursCollectionViewCell: UICollectionViewCell {
+final class ThreeHoursCollectionViewCell: UICollectionViewCell {
     let dayLabel = UILabel()
     let timeLabel = UILabel()
     let weatherImgView = UIImageView()

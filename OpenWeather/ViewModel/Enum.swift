@@ -7,11 +7,6 @@
 
 import Foundation
 
-//var outputWindSpeed: Observable<String?> = Observable(nil)
-//var outputCloudy: Observable<String?> = Observable(nil)
-//var outputPressure: Observable<String?> = Observable(nil)
-//var outputHumidity: Observable<String?> = Observable(nil)
-
 enum WeatherDetailType: String, CaseIterable {
     case windSpeed = "풍속"
     case cloudy = "구름"

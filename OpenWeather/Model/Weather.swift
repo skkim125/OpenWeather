@@ -31,6 +31,10 @@ struct Weather: Decodable {
         let startToday = Calendar.current.startOfDay(for: Date())
         let endToday = Calendar.current.startOfDay(for: Date(timeIntervalSince1970: TimeInterval(Date().addingTimeInterval(86399).timeIntervalSince1970)))
         
+        if date >= startToday && date <= endToday {
+            return "오늘"
+        }
+        
         return formatter.string(from: date)
     }
     
@@ -76,7 +80,7 @@ struct SubWeather: Decodable {
     
     var fiveDays: [Weather] {
         let fiveDaysArray = result.filter({ date in
-            let fiveDays = Date().addingTimeInterval(86400 * 5).timeIntervalSince1970
+            let fiveDays = Date().addingTimeInterval(86400 * 4).timeIntervalSince1970
             return TimeInterval(date.dt) <= fiveDays
         }).filter({ date in
             let day = Date(timeIntervalSince1970: TimeInterval(date.dt)).timeIntervalSince1970
@@ -110,10 +114,6 @@ struct WeatherDetail: Decodable {
     
     var tempStr: String {
         "\(self.temp)" + "º"
-    }
-    
-    var maxminTempStr: String {
-        "최고: \(temp_max)º | 최저: \(temp_min)º"
     }
 }
 

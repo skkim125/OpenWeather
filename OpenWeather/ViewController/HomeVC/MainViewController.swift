@@ -9,7 +9,7 @@ import UIKit
 import MapKit
 import SnapKit
 
-class MainViewController: UIViewController {
+final class MainViewController: UIViewController {
     private let scrollView = UIScrollView()
     private lazy var currentWeatherView = CurrentWeatherView(viewModel: viewModel)
     private let tableStackView = UIStackView()
@@ -92,12 +92,15 @@ class MainViewController: UIViewController {
         self.viewModel.inputSubWeather.bind { _ in
             self.threeHoursCollectionView.reloadData()
             self.fiveDaysViewTableView.reloadData()
+            self.weatherDeatailCollectionView.reloadData()
         }
         
         self.viewModel.outputFiveDays.bind { _ in
-            self.viewModel.outputMinMaxTempOfDay.bind { _ in
-                self.fiveDaysViewTableView.reloadData()
-            }
+            self.fiveDaysViewTableView.reloadData()
+        }
+        
+        self.viewModel.outputMinMaxTempOfDay.bind { _ in
+            self.fiveDaysViewTableView.reloadData()
         }
         
         self.viewModel.outputMapCoord.bind { coord in
@@ -171,7 +174,11 @@ class MainViewController: UIViewController {
         
         fiveDaysView.snp.makeConstraints { make in
             make.horizontalEdges.equalTo(tableStackView)
-            make.height.equalTo(320)
+            if viewModel.outputFiveDays.value.count == 5 {
+                make.height.equalTo(320)
+            } else {
+                make.height.equalTo(320)
+            }
         }
         
         fiveDaysViewTableView.snp.makeConstraints { make in
