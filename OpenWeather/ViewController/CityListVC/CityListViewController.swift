@@ -61,6 +61,8 @@ final class CityListViewController: UIViewController {
         navigationController?.navigationBar.tintColor = .white
         
         navigationItem.leftBarButtonItem = UIBarButtonItem(image: UIImage(systemName: "chevron.backward"), style: .plain, target: self, action: #selector(backButtonClicked))
+        
+        navigationController?.isToolbarHidden = true
     }
     
     @objc private func backButtonClicked() {

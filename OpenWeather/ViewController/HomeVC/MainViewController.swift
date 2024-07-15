@@ -63,7 +63,8 @@ final class MainViewController: UIViewController {
         
         return cv
     }()
-    private let bottomView = MainBottomView()
+    
+    let toolBar = UIToolbar()
     
     private let userdefaultsManager = UserDefaultsManager.shared
     private var viewModel = WeatherViewModel()
@@ -119,6 +120,28 @@ final class MainViewController: UIViewController {
         navigationController?.navigationBar.prefersLargeTitles = false
     }
     
+    @objc func mapbuttonclicked() {
+        
+    }
+    
+    @objc private func cityListButtonClicked() {
+
+        let vc = CityListViewController()
+        vc.viewModel = self.viewModel
+        vc.moveData = { city, vm in
+            self.viewModel = vm
+            self.viewModel.inputCityID.value = city.id
+            self.userdefaultsManager.savedID = city.id
+            self.bindData()
+            self.scrollView.contentOffset = CGPoint(x: 0, y: 0)
+            self.threeHoursCollectionView.reloadData()
+            self.fiveDaysViewTableView.reloadData()
+            self.weatherDeatailCollectionView.reloadData()
+        }
+        
+        navigationController?.pushViewController(vc, animated: true)
+    }
+    
     override func viewWillAppear(_ animated: Bool) {
         navigationController?.isNavigationBarHidden = true
     }
@@ -139,8 +162,7 @@ final class MainViewController: UIViewController {
         currentLocationView.addSubview(mapView)
         
         tableStackView.addArrangedSubview(weatherDeatailCollectionView)
-        
-        view.addSubview(bottomView)
+        view.addSubview(toolBar)
     }
     
     private func configureLayout() {
@@ -202,11 +224,11 @@ final class MainViewController: UIViewController {
             make.horizontalEdges.bottom.equalTo(currentLocationView).inset(20)
         }
         
-        bottomView.snp.makeConstraints { make in
+        toolBar.snp.makeConstraints { make in
             make.top.equalTo(scrollView.snp.bottom)
-            make.bottom.equalTo(view.snp.bottom)
+            make.bottom.equalTo(view).inset(30)
+            make.height.equalTo(50)
             make.horizontalEdges.equalTo(view)
-            make.height.equalTo(80)
         }
     }
     
@@ -218,28 +240,18 @@ final class MainViewController: UIViewController {
         tableStackView.axis = .vertical
         tableStackView.spacing = 20
         
-        bottomView.backgroundColor = #colorLiteral(red: 0.9494348168, green: 0.9246538877, blue: 0.9809295535, alpha: 1)
         
-        bottomView.cityListButton.isUserInteractionEnabled = true
-        bottomView.cityListButton.addTarget(self, action: #selector(cityListButtonClicked), for: .touchUpInside)
+        let mapButton = UIBarButtonItem(image: UIImage(systemName: "map"), style: .plain, target: self, action: #selector(mapbuttonclicked))
+        mapButton.tintColor = .black
+        let cityListButton = UIBarButtonItem(image: UIImage(systemName: "list.bullet"), style: .plain, target: self, action: #selector(cityListButtonClicked))
+        cityListButton.tintColor = .black
+        let flexibleSpace = UIBarButtonItem(barButtonSystemItem: .flexibleSpace, target: self, action: nil)
+        toolBar.items = [mapButton, flexibleSpace, cityListButton]
+        toolBar.isTranslucent = true
+        toolBar.barTintColor = #colorLiteral(red: 0.9494348168, green: 0.9246538877, blue: 0.9809295535, alpha: 1)
+        
     }
     
-    @objc private func cityListButtonClicked() {
-
-        let vc = CityListViewController()
-        vc.viewModel = self.viewModel
-        vc.moveData = { city, vm in
-            self.viewModel = vm
-            self.viewModel.inputCityID.value = city.id
-            self.userdefaultsManager.savedID = city.id
-            self.bindData()
-            self.scrollView.contentOffset = CGPoint(x: 0, y: 0)
-            self.threeHoursCollectionView.reloadData()
-            self.fiveDaysViewTableView.reloadData()
-        }
-        
-        navigationController?.pushViewController(vc, animated: true)
-    }
 }
 
 extension MainViewController: UICollectionViewDelegate, UICollectionViewDataSource, UICollectionViewDelegateFlowLayout {
