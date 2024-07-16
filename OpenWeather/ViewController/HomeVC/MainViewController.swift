@@ -92,15 +92,10 @@ final class MainViewController: UIViewController {
         
         self.viewModel.inputSubWeather.bind { _ in
             self.threeHoursCollectionView.reloadData()
-            self.fiveDaysViewTableView.reloadData()
             self.weatherDeatailCollectionView.reloadData()
         }
         
         self.viewModel.outputFiveDays.bind { _ in
-            self.fiveDaysViewTableView.reloadData()
-        }
-        
-        self.viewModel.outputMinMaxTempOfDay.bind { _ in
             self.fiveDaysViewTableView.reloadData()
         }
         

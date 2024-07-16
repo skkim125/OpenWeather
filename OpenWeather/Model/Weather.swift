@@ -28,12 +28,6 @@ struct Weather: Decodable {
         formatter.dateFormat = "E"
         
         let date = Date(timeIntervalSince1970: TimeInterval(self.dt))
-        let startToday = Calendar.current.startOfDay(for: Date())
-        let endToday = Calendar.current.startOfDay(for: Date(timeIntervalSince1970: TimeInterval(Date().addingTimeInterval(86399).timeIntervalSince1970)))
-        
-        if date >= startToday && date <= endToday {
-            return "오늘"
-        }
         
         return formatter.string(from: date)
     }
