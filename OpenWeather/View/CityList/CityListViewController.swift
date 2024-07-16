@@ -23,7 +23,6 @@ final class CityListViewController: UIViewController {
     private lazy var searchBar: UISearchBar = {
         let searchBar = UISearchBar()
         searchBar.delegate = self
-        searchBar.showsCancelButton = true
         searchBar.searchBarStyle = .minimal
         searchBar.searchTextField.backgroundColor = .darkGray
         searchBar.searchTextField.textColor = .white
@@ -31,24 +30,17 @@ final class CityListViewController: UIViewController {
         return searchBar
     }()
     
-    var viewModel: WeatherViewModel?
-    var moveData: ((City, WeatherViewModel)->())?
-    private var cities: [City] = []
-    private var filteredCities: [City] = []
+    var viewModel = CityListViewModel()
+    var moveData: ((City)->())?
     
     override func viewDidLoad() {
         super.viewDidLoad()
-        
-        if let array = viewModel?.inputCityList.value {
-            filteredCities = array
-            cities = array
-            cityListTableView.reloadData()
-        }
-        
+
         view.backgroundColor = .black
         configureNavigationBar()
         configureHierarchy()
         configureLayout()
+        bindData()
     }
     
     private func configureNavigationBar() {
@@ -86,20 +78,27 @@ final class CityListViewController: UIViewController {
             make.horizontalEdges.bottom.equalTo(view.safeAreaLayoutGuide)
         }
     }
+    
+    func bindData() {
+        viewModel.inputTrigger.value = ()
+        
+        viewModel.outputfilterList.bind { _ in
+            self.cityListTableView.reloadData()
+        }
+    }
 }
 
 extension CityListViewController: UITableViewDelegate, UITableViewDataSource {
     func tableView(_ tableView: UITableView, numberOfRowsInSection section: Int) -> Int {
-        return filteredCities.count
+        return viewModel.outputfilterList.value.count
     }
     
     func tableView(_ tableView: UITableView, cellForRowAt indexPath: IndexPath) -> UITableViewCell {
         let cell = tableView.dequeueReusableCell(withIdentifier: CityListTableViewCell.id, for: indexPath) as! CityListTableViewCell
-        let data = filteredCities[indexPath.row]
-        if let id =  viewModel?.inputCityID.value {
-            let isHidden = (data.id == id) ? false : true
-            cell.configureView(city: data, isHidden: isHidden)
-        }
+        let data = viewModel.outputfilterList.value[indexPath.row]
+        
+        let isHidden = (data.id == viewModel.inputCity.value?.id ?? 0) ? false : true
+        cell.configureView(city: data, isHidden: isHidden)
         
         cell.selectionStyle = .none
         
@@ -107,14 +106,14 @@ extension CityListViewController: UITableViewDelegate, UITableViewDataSource {
     }
     
     func tableView(_ tableView: UITableView, didSelectRowAt indexPath: IndexPath) {
-        let data = filteredCities[indexPath.row]
-            showAlert(city: data)
+        let data = viewModel.outputfilterList.value[indexPath.row]
+        showAlert(city: data)
     }
     
     func showAlert(city: City) {
         let cancel = UIAlertAction(title: "취소", style: .destructive)
         let pickCity = UIAlertAction(title: "확인", style: .default) { _ in
-            self.moveData?(city, self.viewModel!)
+            self.moveData?(city)
             self.navigationController?.popViewController(animated: true)
         }
         
@@ -132,35 +131,29 @@ extension CityListViewController: UISearchBarDelegate {
     }
     
     func searchBar(_ searchBar: UISearchBar, textDidChange searchText: String) {
-        print(searchText)
+        
         if searchText.isEmpty {
-            if let array = viewModel?.inputCityList.value {
-                filteredCities = array
-            }
+            viewModel.outputfilterList.value = viewModel.inputCityList.value
         } else {
             filterCities(text: searchText)
         }
-        cityListTableView.reloadData()
     }
     
     func searchBarCancelButtonClicked(_ searchBar: UISearchBar) {
         searchBar.text = nil
         
-        if let array = viewModel?.inputCityList.value {
-            filteredCities = array
-        }
-        cityListTableView.reloadData()
+        viewModel.outputfilterList.value = viewModel.inputCityList.value
     }
     
     func filterCities(text: String) {
-        var filtering: [City] = []
+        var filterList: [City] = []
         
-        for city in cities {
+        for city in viewModel.inputCityList.value {
             if city.name.lowercased().contains(text.lowercased().trimmingCharacters(in: .whitespaces)) {
-                filtering.append(city)
+                filterList.append(city)
             }
         }
         
-        filteredCities = filtering
+        viewModel.outputfilterList.value = filterList
     }
 }

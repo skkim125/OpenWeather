@@ -62,13 +62,13 @@ final class WeatherDetailCollectionViewCell: UICollectionViewCell {
         }
     }
     
-    func configureView(type: WeatherDetailType, viewModel: WeatherViewModel) {
+    func configureView(type: WeatherDetailType, viewModel: MainViewModel) {
         detailImageView.image = UIImage(systemName: type.image)
         detailLabel.text = type.rawValue
         detailValueLabel.text = setWeatherDetailValue(type: type, viewModel: viewModel)
     }
     
-    private func setWeatherDetailValue(type: WeatherDetailType, viewModel: WeatherViewModel) -> String {
+    private func setWeatherDetailValue(type: WeatherDetailType, viewModel: MainViewModel) -> String {
         switch type {
         case .windSpeed:
             return viewModel.outputWindSpeed.value ?? "--m/s"

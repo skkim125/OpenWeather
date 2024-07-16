@@ -6,51 +6,58 @@
 //
 
 import Foundation
-import MapKit
 
-final class WeatherViewModel {
+final class MainViewModel {
     private let owManager = OpenWeatherManager.shared
     private let userdefaultsManager = UserDefaultsManager.shared
     
-    var inputCityID: Observable<Int> = Observable(0) // 입력 받는 id
+    // MARK: Input
+    // 도시 뷰모델
+    var inputCityID: Observable<Int> = Observable(0)
+    var intputCity: Observable<City?> = Observable(nil)
     var inputCityList: Observable<[City]> = Observable([])
-    var inputCurrentWeather: Observable<Weather?> = Observable(nil)
-    var inputSubWeather: Observable<SubWeather?> = Observable(nil)
     
-    var outputCityID: Observable<Int> = Observable(0) // 호출 id
-    var outputCity: Observable<City?> = Observable(nil)
+    // MARK: Output
+    // OpenWeatherAPI 통신 뷰모델
+    var outputCurrentWeather: Observable<Weather?> = Observable(nil) // 출력할 현재 날씨
+    var outputSubWeather: Observable<SubWeather?> = Observable(nil) // 출력할 서브 날씨
+    
+    // threeHoursView 표시 뷰모델
     var outputCurrentTemperature: Observable<String> = Observable("")
     var outputMaxAndMinTemperature: Observable<String> = Observable("")
     var outputWeatherOverview: Observable<String?> = Observable(nil)
+    
+    // fiveDaysView 표시 뷰모델
+    var outputFiveDays: Observable<[String]> = Observable([])
+    var outputMinMaxTempOfDay: Observable<[String: (Weather, Weather)]> = Observable([:])
+    
+    // weatherDeatailCollectionView 표시 뷰모델
     var outputWindSpeed: Observable<String?> = Observable(nil)
     var outputCloudy: Observable<String?> = Observable(nil)
     var outputPressure: Observable<String?> = Observable(nil)
     var outputHumidity: Observable<String?> = Observable(nil)
-    var outputMapCoord: Observable<CLLocationCoordinate2D?> = Observable(CLLocationCoordinate2D(latitude: 0.0, longitude: 0.0))
+    
+    // 맵 표시 및 네트워크 연결 관련 alert 표시
+    var outputMapCoord: Observable<(Double?, Double?)> = Observable((nil, nil))
     var outputShowAlert: Observable<Bool> = Observable(false)
-    var outputFiveDays: Observable<[String]> = Observable([])
-    var outputMinMaxTempOfDay: Observable<[String: (Weather, Weather)]> = Observable([:])
     
     init() {
-        
+        transform()
+    }
+    
+    func transform() {
         fetchJson()
+        setInputCityID()
         
-        inputCityID.value = userdefaultsManager.savedID
         inputCityID.bind { id in
-            if id != 0 {
-                self.outputCityID.value = id
-                self.outputCity.value = self.inputCityList.value.filter({ $0.id == id }).first!
-            } else {
-                self.outputCityID.value = 1835847
-            }
+            guard let city = self.inputCityList.value.filter({ $0.id == id }).first else { return }
+            self.intputCity.value = city
+            self.outputMapCoord.value = (city.coord.lat, city.coord.lon)
+            
+            self.callWeather()
         }
         
-        outputCityID.bind { id in
-            self.outputMapCoord.value = CLLocationCoordinate2D(latitude: self.outputCity.value?.coord.lat ?? 0.0, longitude: self.outputCity.value?.coord.lon ?? 0.0)
-            self.callWeather(id: id)
-        }
-        
-        inputCurrentWeather.bind { current in
+        outputCurrentWeather.bind { current in
             self.outputCurrentTemperature.value = current?.weatherDetail.tempStr ?? "--º"
             
             self.outputWeatherOverview.value = current?.weatherImage.first?.description ?? "--"
@@ -60,33 +67,6 @@ final class WeatherViewModel {
             self.outputCloudy.value = "\(Int(current?.clouds.all ?? 0.0))" + "%"
             self.outputPressure.value = NumberFormatter.localizedString(from: (current?.weatherDetail.pressure ?? 0) as NSNumber, number: .decimal) + "hpa"
             self.outputHumidity.value = NumberFormatter.localizedString(from: (current?.weatherDetail.humidity ?? 0) as NSNumber, number: .decimal) + "%"
-            
-        }
-    }
-    
-    private func callWeather(id: Int) {
-        self.owManager.callRequest(api: .currentURL(id), requestAPIType: Weather.self) { data in
-            if let data = data {
-                self.inputCurrentWeather.value = data
-                self.outputShowAlert.value = false
-            } else {
-                self.outputShowAlert.value = true
-            }
-        }
-        
-        self.owManager.callRequest(api: .subWeatherURL(id), requestAPIType: SubWeather.self) { data in
-            if let data = data {
-                self.inputSubWeather.value = data
-                self.outputMapCoord.value = CLLocationCoordinate2D(latitude: data.city.coord.lat, longitude: data.city.coord.lon)
-                self.outputShowAlert.value = false
-                self.addMinMaxTemp(data: data)
-                self.outputFiveDays.value = self.mappingFiveDays(fiveDays: data.fiveDays)
-                if let day = self.inputCurrentWeather.value?.day {
-                    self.setOutputMaxAndMinTemperature(day: day)
-                }
-            } else {
-                self.outputShowAlert.value = true
-            }
         }
     }
     
@@ -101,6 +81,41 @@ final class WeatherViewModel {
         if let data = data,
            let cities = try? decoder.decode([City].self, from: data) {
             inputCityList.value = cities
+        }
+    }
+    
+    private func setInputCityID() {
+        if self.userdefaultsManager.savedID != 0 {
+            self.inputCityID.value = self.userdefaultsManager.savedID
+            
+        } else {
+            self.inputCityID.value = 1835847
+        }
+    }
+    
+    private func callWeather() {
+        self.owManager.callRequest(api: .currentURL(inputCityID.value), requestAPIType: Weather.self) { data in
+            if let data = data {
+                self.outputCurrentWeather.value = data
+                self.outputShowAlert.value = false
+            } else {
+                self.outputShowAlert.value = true
+            }
+        }
+        
+        self.owManager.callRequest(api: .subWeatherURL(inputCityID.value), requestAPIType: SubWeather.self) { data in
+            if let data = data {
+                self.outputSubWeather.value = data
+                self.outputMapCoord.value = (data.city.coord.lat, data.city.coord.lon)
+                self.outputShowAlert.value = false
+                self.addMinMaxTemp(data: data)
+                self.outputFiveDays.value = self.mappingFiveDays(fiveDays: data.fiveDays)
+                if let day = self.outputCurrentWeather.value?.day {
+                    self.setOutputMaxAndMinTemperature(day: day)
+                }
+            } else {
+                self.outputShowAlert.value = true
+            }
         }
     }
     
@@ -121,14 +136,16 @@ final class WeatherViewModel {
         }
     }
     
-    func setOutputMaxAndMinTemperature(day: String) {
-        let cwMinTemp: String? = String(self.outputMinMaxTempOfDay.value[day]?.0.weatherDetail.temp_min ?? 0.0)
-        let cwMaxTemp: String? = String(self.outputMinMaxTempOfDay.value[day]?.1.weatherDetail.temp_max ?? 0.0)
-        
-        self.outputMaxAndMinTemperature.value = "최고: \(cwMaxTemp ?? "--")º | 최저: \(cwMinTemp ?? "--")º"
+    private func setOutputMaxAndMinTemperature(day: String) {
+        if let current = outputCurrentWeather.value {
+            let cwMinTemp: String? = String(self.outputMinMaxTempOfDay.value[day]?.0.weatherDetail.temp_min ?? current.weatherDetail.temp_min)
+            let cwMaxTemp: String? = String(self.outputMinMaxTempOfDay.value[day]?.1.weatherDetail.temp_max ?? current.weatherDetail.temp_max)
+            
+            self.outputMaxAndMinTemperature.value = "최고: \(cwMaxTemp ?? "--")º | 최저: \(cwMinTemp ?? "--")º"
+        }
     }
     
-    func mappingFiveDays(fiveDays: [Weather]) -> [String] {
+    private func mappingFiveDays(fiveDays: [Weather]) -> [String] {
         let mapping = fiveDays.map({ $0.day })
         return Array(Set(mapping)).sorted(by: { $0 < $1 })
     }

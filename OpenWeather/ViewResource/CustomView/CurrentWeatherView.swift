@@ -41,7 +41,7 @@ final class CurrentWeatherView: UIStackView {
         return label
     }()
     
-    init(viewModel: WeatherViewModel) {
+    init(viewModel: MainViewModel) {
         super.init(frame: .zero)
         
         configureHierarchy()
@@ -50,8 +50,8 @@ final class CurrentWeatherView: UIStackView {
         
     }
     
-    private func bindData(viewModel: WeatherViewModel) {
-        viewModel.outputCity.bind { city in
+    private func bindData(viewModel: MainViewModel) {
+        viewModel.intputCity.bind { city in
             self.cityNameLabel.text = city?.name ?? ""
         }
         

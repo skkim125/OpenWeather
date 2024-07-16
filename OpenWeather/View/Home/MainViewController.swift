@@ -67,7 +67,7 @@ final class MainViewController: UIViewController {
     let toolBar = UIToolbar()
     
     private let userdefaultsManager = UserDefaultsManager.shared
-    private var viewModel = WeatherViewModel()
+    private var viewModel = MainViewModel()
     
     override func viewDidLoad() {
         super.viewDidLoad()
@@ -84,29 +84,30 @@ final class MainViewController: UIViewController {
     }
     
     private func bindData() {
-        self.viewModel.outputShowAlert.bind { show in
-            if show {
-                self.showAlert()
-            }
-        }
         
-        self.viewModel.inputSubWeather.bind { _ in
+        viewModel.outputSubWeather.bind { _ in
             self.threeHoursCollectionView.reloadData()
             self.weatherDeatailCollectionView.reloadData()
         }
         
-        self.viewModel.outputFiveDays.bind { _ in
+        viewModel.outputFiveDays.bind { _ in
             self.fiveDaysViewTableView.reloadData()
         }
         
-        self.viewModel.outputMapCoord.bind { coord in
-            self.mapView.region = .init(center: coord ?? CLLocationCoordinate2D(latitude: 0.0, longitude: 0.0), latitudinalMeters: 20000, longitudinalMeters: 20000)
+        viewModel.outputMapCoord.bind { coord in
+            self.mapView.region = .init(center: CLLocationCoordinate2D(latitude: coord.0 ?? 0.0, longitude: coord.1 ?? 0.0), latitudinalMeters: 20000, longitudinalMeters: 20000)
             
             let marker = MKPointAnnotation()
-            marker.coordinate = coord ?? CLLocationCoordinate2D(latitude: 0.0, longitude: 0.0)
+            marker.coordinate = CLLocationCoordinate2D(latitude: coord.0 ?? 0.0, longitude: coord.1 ?? 0.0)
             
-            marker.title = self.viewModel.outputCity.value?.name ?? ""
+            marker.title = self.viewModel.intputCity.value?.name ?? ""
             self.mapView.addAnnotation(marker)
+        }
+        
+        viewModel.outputShowAlert.bind { show in
+            if show {
+                self.showAlert()
+            }
         }
     }
     
@@ -122,9 +123,9 @@ final class MainViewController: UIViewController {
     @objc private func cityListButtonClicked() {
 
         let vc = CityListViewController()
-        vc.viewModel = self.viewModel
-        vc.moveData = { city, vm in
-            self.viewModel = vm
+        vc.viewModel.inputCityList = self.viewModel.inputCityList
+        vc.viewModel.inputCity = self.viewModel.intputCity
+        vc.moveData = { city in
             self.viewModel.inputCityID.value = city.id
             self.userdefaultsManager.savedID = city.id
             self.bindData()
@@ -191,11 +192,7 @@ final class MainViewController: UIViewController {
         
         fiveDaysView.snp.makeConstraints { make in
             make.horizontalEdges.equalTo(tableStackView)
-            if viewModel.outputFiveDays.value.count == 5 {
                 make.height.equalTo(320)
-            } else {
-                make.height.equalTo(320)
-            }
         }
         
         fiveDaysViewTableView.snp.makeConstraints { make in
@@ -264,7 +261,7 @@ extension MainViewController: UICollectionViewDelegate, UICollectionViewDataSour
     
     func collectionView(_ collectionView: UICollectionView, numberOfItemsInSection section: Int) -> Int {
         if collectionView == threeHoursCollectionView {
-            return viewModel.inputSubWeather.value?.rangeOfTomorrow.count ?? 0
+            return viewModel.outputSubWeather.value?.rangeOfTomorrow.count ?? 0
         } else {
             return WeatherDetailType.allCases.count
         }
@@ -274,7 +271,7 @@ extension MainViewController: UICollectionViewDelegate, UICollectionViewDataSour
         if collectionView == threeHoursCollectionView {
             guard let cell = collectionView.dequeueReusableCell(withReuseIdentifier: ThreeHoursCollectionViewCell.id, for: indexPath) as? ThreeHoursCollectionViewCell else { return UICollectionViewCell() }
             
-            if let data = viewModel.inputSubWeather.value {
+            if let data = viewModel.outputSubWeather.value {
                 cell.backgroundColor = .clear
                 cell.configureView(subWeather: data.result[indexPath.row])
             }
@@ -297,7 +294,7 @@ extension MainViewController: UICollectionViewDelegate, UICollectionViewDataSour
 
 extension MainViewController: UITableViewDelegate, UITableViewDataSource {
     func tableView(_ tableView: UITableView, numberOfRowsInSection section: Int) -> Int {
-        return viewModel.outputFiveDays.value.count
+        return viewModel.outputMinMaxTempOfDay.value.count
     }
     
     func tableView(_ tableView: UITableView, cellForRowAt indexPath: IndexPath) -> UITableViewCell {
