@@ -7,7 +7,7 @@
 
 import Foundation
 
-class CityListViewModel {
+final class CityListViewModel {
     // MARK: Input
     // input 트리거
     var inputTrigger: Observable<Void?> = Observable(nil)

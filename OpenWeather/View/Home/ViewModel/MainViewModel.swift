@@ -92,16 +92,16 @@ final class MainViewModel {
     }
     
     private func setInputCityID() {
-        if self.userdefaultsManager.savedID != 0 {
-            self.inputCityID.value = self.userdefaultsManager.savedID
+        if userdefaultsManager.savedID != 0 {
+            inputCityID.value = userdefaultsManager.savedID
             
         } else {
-            self.inputCityID.value = 1835847
+            inputCityID.value = 1835847
         }
     }
     
     private func callWeather() {
-        self.owManager.callRequest(api: .currentURL(inputCityID.value), requestAPIType: Weather.self) { [weak self] response in
+        owManager.callRequest(api: .currentURL(inputCityID.value), requestAPIType: Weather.self) { [weak self] response in
             guard let self = self else { return }
             switch response {
             case .success(let data):
@@ -113,7 +113,7 @@ final class MainViewModel {
             }
         }
         
-        self.owManager.callRequest(api: .subWeatherURL(inputCityID.value), requestAPIType: SubWeather.self) { [weak self] response in
+        owManager.callRequest(api: .subWeatherURL(inputCityID.value), requestAPIType: SubWeather.self) { [weak self] response in
             
             guard let self = self else { return }
             switch response {
@@ -152,8 +152,8 @@ final class MainViewModel {
     
     private func setOutputMaxAndMinTemperature(day: String) {
         if let current = outputCurrentWeather.value {
-            let cwMinTemp: String? = String(self.outputMinMaxTempOfDay.value[day]?.0.weatherDetail.temp_min ?? current.weatherDetail.temp_min)
-            let cwMaxTemp: String? = String(self.outputMinMaxTempOfDay.value[day]?.1.weatherDetail.temp_max ?? current.weatherDetail.temp_max)
+            let cwMinTemp: String? = String(outputMinMaxTempOfDay.value[day]?.0.weatherDetail.temp_min ?? current.weatherDetail.temp_min)
+            let cwMaxTemp: String? = String(outputMinMaxTempOfDay.value[day]?.1.weatherDetail.temp_max ?? current.weatherDetail.temp_max)
             
             outputMaxAndMinTemperature.value = "최고: \(cwMaxTemp ?? "--")º | 최저: \(cwMinTemp ?? "--")º"
         }

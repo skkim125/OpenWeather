@@ -6,6 +6,7 @@
 //
 
 import UIKit
+import SnapKit
 
 final class CurrentWeatherView: UIStackView {
     private let cityNameLabel = {

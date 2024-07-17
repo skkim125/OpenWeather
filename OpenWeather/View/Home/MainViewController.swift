@@ -83,6 +83,10 @@ final class MainViewController: UIViewController {
         bindData()
     }
     
+    deinit {
+        print("MainViewController Deinit")
+    }
+    
     private func bindData() {
         
         viewModel.outputSubWeather.bind { [weak self] _ in
@@ -107,12 +111,12 @@ final class MainViewController: UIViewController {
             self.mapView.addAnnotation(marker)
         }
         
-        viewModel.outputShowAlert.bind { [weak self] show in
-            guard let self = self else { return }
-            if show {
-                self.showAlert()
-            }
-        }
+//        viewModel.outputShowAlert.bind { [weak self] show in
+//            guard let self = self else { return }
+//            if show {
+//                self.showAlert()
+//            }
+//        }
     }
     
     private func configureNavigationBar() {
@@ -121,19 +125,19 @@ final class MainViewController: UIViewController {
     }
     
     @objc func mapbuttonclicked() {
-        
+        let nav = UINavigationController(rootViewController: SelectLocationMapView())
+        present(nav, animated: true)
     }
     
     @objc private func cityListButtonClicked() {
 
         let vc = CityListViewController()
-        vc.viewModel.inputCityList = self.viewModel.inputCityList
-        vc.viewModel.inputCity = self.viewModel.intputCity
+        vc.viewModel.inputCityList = viewModel.inputCityList
+        vc.viewModel.inputCity = viewModel.intputCity
         vc.moveData = { [weak self] city in
             guard let self = self else { return }
             self.viewModel.inputCityID.value = city.id
             self.userdefaultsManager.savedID = city.id
-            self.bindData()
             self.scrollView.contentOffset = CGPoint(x: 0, y: 0)
             self.threeHoursCollectionView.reloadData()
             self.fiveDaysViewTableView.reloadData()
@@ -299,7 +303,7 @@ extension MainViewController: UICollectionViewDelegate, UICollectionViewDataSour
 
 extension MainViewController: UITableViewDelegate, UITableViewDataSource {
     func tableView(_ tableView: UITableView, numberOfRowsInSection section: Int) -> Int {
-        return viewModel.outputMinMaxTempOfDay.value.count
+        return viewModel.outputFiveDays.value.count
     }
     
     func tableView(_ tableView: UITableView, cellForRowAt indexPath: IndexPath) -> UITableViewCell {

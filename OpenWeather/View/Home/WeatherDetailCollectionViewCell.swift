@@ -16,15 +16,16 @@ final class WeatherDetailCollectionViewCell: UICollectionViewCell {
         
         return imageView
     }()
-    private let detailLabel = {
+    private let detailLabel: UILabel = {
         let label = UILabel()
         label.textColor = .darkGray
         label.font = .boldSystemFont(ofSize: 20)
         
         return label
     }()
-    private let detailValueLabel = {
+    private let detailValueLabel: UILabel = {
         let label = UILabel()
+        label.textColor = .black
         label.font = .systemFont(ofSize: 30)
         
         return label

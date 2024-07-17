@@ -10,10 +10,35 @@ import Kingfisher
 import SnapKit
 
 final class FiveDaysTableViewCell: UITableViewCell {
-    private let daysLabel = UILabel()
-    private let dayWeatherImageView = UIImageView()
-    private let minTempLabel = UILabel()
-    private let maxTempLabel = UILabel()
+    private let daysLabel: UILabel = {
+        let label = UILabel()
+        label.font = .boldSystemFont(ofSize: 20)
+        label.textColor = .black
+        
+        return label
+    }()
+    private let dayWeatherImageView: UIImageView = {
+        let imageView = UIImageView()
+        imageView.contentMode = .scaleAspectFit
+        
+        return imageView
+    }()
+    private let minTempLabel: UILabel = {
+        let label = UILabel()
+        label.textColor = .darkGray
+        label.font = .boldSystemFont(ofSize: 20)
+        label.textAlignment = .center
+        
+        return label
+    }()
+    private let maxTempLabel: UILabel = {
+        let label = UILabel()
+        label.font = .boldSystemFont(ofSize: 20)
+        label.textColor = .black
+        label.textAlignment = .right
+        
+        return label
+    }()
     
     override init(style: UITableViewCell.CellStyle, reuseIdentifier: String?) {
         super.init(style: style, reuseIdentifier: reuseIdentifier)
@@ -60,20 +85,9 @@ final class FiveDaysTableViewCell: UITableViewCell {
     
     func configureView(minWeather: Weather, maxWeather: Weather) {
         daysLabel.text = minWeather.dayOfWeek
-        daysLabel.font = .boldSystemFont(ofSize: 20)
-        
         dayWeatherImageView.kf.setImage(with: URL(string: maxWeather.weatherImageURL))
-        dayWeatherImageView.contentMode = .scaleAspectFit
-        
         minTempLabel.text = "최저" + String.transTempStr(minWeather.weatherDetail.temp_min)
-        minTempLabel.textColor = .darkGray
-        minTempLabel.font = .boldSystemFont(ofSize: 20)
-        minTempLabel.textAlignment = .center
-        
-        
         maxTempLabel.text = "최고" + String.transTempStr(maxWeather.weatherDetail.temp_max)
-        maxTempLabel.font = .boldSystemFont(ofSize: 20)
-        maxTempLabel.textAlignment = .right
     }
     
     required init?(coder: NSCoder) {

@@ -10,10 +10,36 @@ import Kingfisher
 import SnapKit
 
 final class ThreeHoursCollectionViewCell: UICollectionViewCell {
-    let dayLabel = UILabel()
-    let timeLabel = UILabel()
-    let weatherImgView = UIImageView()
-    let temperatureLabel = UILabel()
+    let dayLabel: UILabel = {
+        let label = UILabel()
+        label.textColor = .darkGray
+        label.textAlignment = .center
+        label.font = .boldSystemFont(ofSize: 13)
+        
+        return label
+    }()
+    let timeLabel: UILabel = {
+        let label = UILabel()
+        label.textColor = .black
+        label.textAlignment = .center
+        label.font = .systemFont(ofSize: 14)
+        
+        return label
+    }()
+    let weatherImgView: UIImageView = {
+        let imageView = UIImageView()
+        imageView.contentMode = .scaleAspectFill
+        
+        return imageView
+    }()
+    let temperatureLabel: UILabel = {
+        let label = UILabel()
+        label.textColor = .black
+        label.textAlignment = .center
+        label.font = .boldSystemFont(ofSize: 17)
+        
+        return label
+    }()
     
     override init(frame: CGRect) {
         super.init(frame: .zero)
@@ -63,20 +89,9 @@ final class ThreeHoursCollectionViewCell: UICollectionViewCell {
     func configureView(subWeather: Weather) {
         
         dayLabel.text = subWeather.day
-        dayLabel.textColor = .darkGray
-        dayLabel.textAlignment = .center
-        dayLabel.font = .boldSystemFont(ofSize: 13)
-        
         timeLabel.text = subWeather.hour
-        timeLabel.textAlignment = .center
-        timeLabel.font = .systemFont(ofSize: 14)
-        
         weatherImgView.kf.setImage(with: URL(string: subWeather.weatherImageURL))
-        weatherImgView.contentMode = .scaleAspectFill
-        
         temperatureLabel.text = subWeather.weatherDetail.tempStr
-        temperatureLabel.textAlignment = .center
-        temperatureLabel.font = .boldSystemFont(ofSize: 17)
     }
     
     @available(*, unavailable)
