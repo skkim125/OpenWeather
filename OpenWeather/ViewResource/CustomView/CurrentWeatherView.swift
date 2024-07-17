@@ -51,19 +51,23 @@ final class CurrentWeatherView: UIStackView {
     }
     
     private func bindData(viewModel: MainViewModel) {
-        viewModel.intputCity.bind { city in
+        viewModel.intputCity.bind { [weak self] city in
+            guard let self = self else { return }
             self.cityNameLabel.text = city?.name ?? ""
         }
         
-        viewModel.outputCurrentTemperature.bind { ct in
+        viewModel.outputCurrentTemperature.bind { [weak self] ct in
+            guard let self = self else { return }
             self.currentTemperatureLabel.text = ct
         }
         
-        viewModel.outputMaxAndMinTemperature.bind { temp in
+        viewModel.outputMaxAndMinTemperature.bind { [weak self] temp in
+            guard let self = self else { return }
             self.max_minTemperatureLabel.text = temp
         }
         
-        viewModel.outputWeatherOverview.bind { overview in
+        viewModel.outputWeatherOverview.bind { [weak self] overview in
+            guard let self = self else { return }
             self.weatherOverviewLabel.text = overview
         }
     }

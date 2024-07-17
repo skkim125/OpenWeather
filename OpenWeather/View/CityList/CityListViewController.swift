@@ -82,7 +82,8 @@ final class CityListViewController: UIViewController {
     func bindData() {
         viewModel.inputTrigger.value = ()
         
-        viewModel.outputfilterList.bind { _ in
+        viewModel.outputfilterList.bind { [weak self] _ in
+            guard let self = self else { return }
             self.cityListTableView.reloadData()
         }
     }

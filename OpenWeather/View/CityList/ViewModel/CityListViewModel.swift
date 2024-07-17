@@ -22,8 +22,14 @@ class CityListViewModel {
     
     
     init() {
-        inputTrigger.bind { _ in
+        print("CityListViewModel init")
+        inputTrigger.bind { [weak self] _ in
+            guard let self = self else { return }
             self.outputfilterList.value = self.inputCityList.value
         }
+    }
+    
+    deinit {
+        print("CityListViewModel deinit")
     }
 }

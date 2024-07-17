@@ -42,14 +42,20 @@ final class MainViewModel {
     var outputShowAlert: Observable<Bool> = Observable(false)
     
     init() {
+        print("mainviewmodel init")
         transform()
+    }
+    
+    deinit {
+        print("mainviewmodel deinit")
     }
     
     func transform() {
         fetchJson()
         setInputCityID()
         
-        inputCityID.bind { id in
+        inputCityID.bind { [weak self] id in
+            guard let self = self else { return }
             guard let city = self.inputCityList.value.filter({ $0.id == id }).first else { return }
             self.intputCity.value = city
             self.outputMapCoord.value = (city.coord.lat, city.coord.lon)
@@ -57,7 +63,8 @@ final class MainViewModel {
             self.callWeather()
         }
         
-        outputCurrentWeather.bind { current in
+        outputCurrentWeather.bind { [weak self] current in
+            guard let self = self else { return }
             self.outputCurrentTemperature.value = current?.weatherDetail.tempStr ?? "--º"
             
             self.outputWeatherOverview.value = current?.weatherImage.first?.description ?? "--"
@@ -94,17 +101,23 @@ final class MainViewModel {
     }
     
     private func callWeather() {
-        self.owManager.callRequest(api: .currentURL(inputCityID.value), requestAPIType: Weather.self) { data in
-            if let data = data {
+        self.owManager.callRequest(api: .currentURL(inputCityID.value), requestAPIType: Weather.self) { [weak self] response in
+            guard let self = self else { return }
+            switch response {
+            case .success(let data):
                 self.outputCurrentWeather.value = data
                 self.outputShowAlert.value = false
-            } else {
+            case .failure(let error):
+                print(error)
                 self.outputShowAlert.value = true
             }
         }
         
-        self.owManager.callRequest(api: .subWeatherURL(inputCityID.value), requestAPIType: SubWeather.self) { data in
-            if let data = data {
+        self.owManager.callRequest(api: .subWeatherURL(inputCityID.value), requestAPIType: SubWeather.self) { [weak self] response in
+            
+            guard let self = self else { return }
+            switch response {
+            case .success(let data):
                 self.outputSubWeather.value = data
                 self.outputMapCoord.value = (data.city.coord.lat, data.city.coord.lon)
                 self.outputShowAlert.value = false
@@ -113,7 +126,8 @@ final class MainViewModel {
                 if let day = self.outputCurrentWeather.value?.day {
                     self.setOutputMaxAndMinTemperature(day: day)
                 }
-            } else {
+            case .failure(let error):
+                print(error)
                 self.outputShowAlert.value = true
             }
         }
@@ -141,7 +155,7 @@ final class MainViewModel {
             let cwMinTemp: String? = String(self.outputMinMaxTempOfDay.value[day]?.0.weatherDetail.temp_min ?? current.weatherDetail.temp_min)
             let cwMaxTemp: String? = String(self.outputMinMaxTempOfDay.value[day]?.1.weatherDetail.temp_max ?? current.weatherDetail.temp_max)
             
-            self.outputMaxAndMinTemperature.value = "최고: \(cwMaxTemp ?? "--")º | 최저: \(cwMinTemp ?? "--")º"
+            outputMaxAndMinTemperature.value = "최고: \(cwMaxTemp ?? "--")º | 최저: \(cwMinTemp ?? "--")º"
         }
     }
     

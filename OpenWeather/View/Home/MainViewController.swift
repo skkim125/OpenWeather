@@ -85,16 +85,19 @@ final class MainViewController: UIViewController {
     
     private func bindData() {
         
-        viewModel.outputSubWeather.bind { _ in
+        viewModel.outputSubWeather.bind { [weak self] _ in
+            guard let self = self else { return }
             self.threeHoursCollectionView.reloadData()
             self.weatherDeatailCollectionView.reloadData()
         }
         
-        viewModel.outputFiveDays.bind { _ in
+        viewModel.outputFiveDays.bind { [weak self] _ in
+            guard let self = self else { return }
             self.fiveDaysViewTableView.reloadData()
         }
         
-        viewModel.outputMapCoord.bind { coord in
+        viewModel.outputMapCoord.bind { [weak self] coord in
+            guard let self = self else { return }
             self.mapView.region = .init(center: CLLocationCoordinate2D(latitude: coord.0 ?? 0.0, longitude: coord.1 ?? 0.0), latitudinalMeters: 20000, longitudinalMeters: 20000)
             
             let marker = MKPointAnnotation()
@@ -104,7 +107,8 @@ final class MainViewController: UIViewController {
             self.mapView.addAnnotation(marker)
         }
         
-        viewModel.outputShowAlert.bind { show in
+        viewModel.outputShowAlert.bind { [weak self] show in
+            guard let self = self else { return }
             if show {
                 self.showAlert()
             }
@@ -125,7 +129,8 @@ final class MainViewController: UIViewController {
         let vc = CityListViewController()
         vc.viewModel.inputCityList = self.viewModel.inputCityList
         vc.viewModel.inputCity = self.viewModel.intputCity
-        vc.moveData = { city in
+        vc.moveData = { [weak self] city in
+            guard let self = self else { return }
             self.viewModel.inputCityID.value = city.id
             self.userdefaultsManager.savedID = city.id
             self.bindData()
