@@ -11,14 +11,11 @@ import Alamofire
 enum OpenWeatherRouter {
     case currentURL(Int)
     case subWeatherURL(Int)
+    case locationURL(Double, Double)
     
-    var apiType: String {
-        switch self {
-        case .currentURL:
-            "weather?"
-        case .subWeatherURL:
-            "forecast?"
-        }
+    enum apiType: String {
+        case current = "weather?"
+        case subWeather = "forecast?"
     }
     
     var parameters: Parameters {
@@ -26,6 +23,15 @@ enum OpenWeatherRouter {
         case .currentURL(let id), .subWeatherURL(let id):
             return [
                 "id": "\(id)",
+                "appid": "\(OpenWeatherAPI.key)",
+                "units": "metric",
+                "lang": "kr"
+            ]
+            
+        case .locationURL(let lan, let lon):
+            return [
+                "lan": "\(lan)",
+                "lon": "\(lon)",
                 "appid": "\(OpenWeatherAPI.key)",
                 "units": "metric",
                 "lang": "kr"

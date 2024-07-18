@@ -12,15 +12,16 @@ final class CurrentWeatherView: UIStackView {
     private let cityNameLabel = {
         let label = UILabel()
         label.textColor = .black.withAlphaComponent(0.8)
-        label.font = .systemFont(ofSize: 45)
+        label.font = .systemFont(ofSize: 40)
         label.textAlignment = .center
+        label.numberOfLines = 2
         
         return label
     }()
     private let currentTemperatureLabel = {
         let label = UILabel()
         label.textColor = .black.withAlphaComponent(0.8)
-        label.font = .systemFont(ofSize: 80)
+        label.font = .systemFont(ofSize: 70)
         label.textAlignment = .center
         
         return label
@@ -83,6 +84,7 @@ final class CurrentWeatherView: UIStackView {
             make.top.equalTo(self.snp.top)
             make.height.equalTo(60)
             make.centerX.equalTo(self.snp.centerX)
+            make.horizontalEdges.equalTo(self.safeAreaLayoutGuide).inset(20)
         }
         
         currentTemperatureLabel.snp.makeConstraints { make in

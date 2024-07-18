@@ -8,11 +8,24 @@
 import UIKit
 
 extension UIViewController {
-    func showAlert() {
-        let alert = UIAlertController(title: "네트워크 연결 실패", message: "잠시 후 다시 시도해주세요", preferredStyle: .alert)
+    func showOneButtonAlert(title: String, message: String?) {
+        let alert = UIAlertController(title: title, message: message, preferredStyle: .alert)
         let back = UIAlertAction(title: "확인", style: .default)
         
         alert.addAction(back)
+        
+        present(alert, animated: true)
+    }
+    
+    func showTwoButtonAlert(title: String, message: String?, checkButtonTitle: String, completionHandler: @escaping () -> Void) {
+        let alert = UIAlertController(title: title, message: message, preferredStyle: .alert)
+        let cancel = UIAlertAction(title: "취소", style: .destructive)
+        let ok = UIAlertAction(title: checkButtonTitle, style: .default) { _ in
+            completionHandler()
+        }
+        
+        alert.addAction(cancel)
+        alert.addAction(ok)
         
         present(alert, animated: true)
     }

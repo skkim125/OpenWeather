@@ -111,7 +111,7 @@ final class MainViewController: UIViewController {
         viewModel.outputShowAlert.bind { [weak self] show in
             guard let self = self else { return }
             if show {
-                self.showAlert()
+                self.showOneButtonAlert(title: "네트워크 연결 실패", message: "잠시 후 다시 시도해주세요")
             }
         }
     }

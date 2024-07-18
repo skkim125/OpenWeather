@@ -104,7 +104,7 @@ final class MainViewModel {
         let group = DispatchGroup()
         
         group.enter()
-        owManager.callRequest(api: .currentURL(inputCityID.value), requestAPIType: Weather.self) { [weak self] response in
+        owManager.callRequest(api: .currentURL(inputCityID.value), apiType: .current, requestAPIType: Weather.self) { [weak self] response in
             guard let self = self else { return }
             switch response {
             case .success(let data):
@@ -117,7 +117,7 @@ final class MainViewModel {
         }
         
         group.enter()
-        owManager.callRequest(api: .subWeatherURL(inputCityID.value), requestAPIType: SubWeather.self) { [weak self] response in
+        owManager.callRequest(api: .subWeatherURL(inputCityID.value), apiType: .subWeather, requestAPIType: SubWeather.self) { [weak self] response in
             
             guard let self = self else { return }
             switch response {

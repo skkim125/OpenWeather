@@ -38,6 +38,7 @@
 		04671F9B2C411B6300EF5C1B /* IDProtocol.swift in Sources */ = {isa = PBXBuildFile; fileRef = 04671F9A2C411B6300EF5C1B /* IDProtocol.swift */; };
 		04671F9E2C4123D500EF5C1B /* Kingfisher in Frameworks */ = {isa = PBXBuildFile; productRef = 04671F9D2C4123D500EF5C1B /* Kingfisher */; };
 		047EB4C92C47929C00612562 /* SelectLocationMapView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 047EB4C82C47929C00612562 /* SelectLocationMapView.swift */; };
+		047EB4D22C491D5200612562 /* SelectLocationMapViewModel.swift in Sources */ = {isa = PBXBuildFile; fileRef = 047EB4D12C491D5200612562 /* SelectLocationMapViewModel.swift */; };
 		04FD29572C437FB8001C6739 /* WeatherDetailCollectionViewCell.swift in Sources */ = {isa = PBXBuildFile; fileRef = 04FD29562C437FB8001C6739 /* WeatherDetailCollectionViewCell.swift */; };
 		04FD29592C438ADC001C6739 /* UIViewController+Extension.swift in Sources */ = {isa = PBXBuildFile; fileRef = 04FD29582C438ADC001C6739 /* UIViewController+Extension.swift */; };
 		04FD295B2C439304001C6739 /* Enum.swift in Sources */ = {isa = PBXBuildFile; fileRef = 04FD295A2C439304001C6739 /* Enum.swift */; };
@@ -73,6 +74,7 @@
 		04671F982C4118D000EF5C1B /* ThreeHoursCollectionViewCell.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ThreeHoursCollectionViewCell.swift; sourceTree = "<group>"; };
 		04671F9A2C411B6300EF5C1B /* IDProtocol.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = IDProtocol.swift; sourceTree = "<group>"; };
 		047EB4C82C47929C00612562 /* SelectLocationMapView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SelectLocationMapView.swift; sourceTree = "<group>"; };
+		047EB4D12C491D5200612562 /* SelectLocationMapViewModel.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SelectLocationMapViewModel.swift; sourceTree = "<group>"; };
 		04FD29562C437FB8001C6739 /* WeatherDetailCollectionViewCell.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = WeatherDetailCollectionViewCell.swift; sourceTree = "<group>"; };
 		04FD29582C438ADC001C6739 /* UIViewController+Extension.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "UIViewController+Extension.swift"; sourceTree = "<group>"; };
 		04FD295A2C439304001C6739 /* Enum.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Enum.swift; sourceTree = "<group>"; };
@@ -212,8 +214,17 @@
 			isa = PBXGroup;
 			children = (
 				047EB4C82C47929C00612562 /* SelectLocationMapView.swift */,
+				047EB4D32C491D5600612562 /* ViewModel */,
 			);
 			path = MapView;
+			sourceTree = "<group>";
+		};
+		047EB4D32C491D5600612562 /* ViewModel */ = {
+			isa = PBXGroup;
+			children = (
+				047EB4D12C491D5200612562 /* SelectLocationMapViewModel.swift */,
+			);
+			path = ViewModel;
 			sourceTree = "<group>";
 		};
 		04FD295C2C439312001C6739 /* Network */ = {
@@ -343,6 +354,7 @@
 				04671F902C40EFE100EF5C1B /* OpenWeatherRouter.swift in Sources */,
 				04671F642C3FBDD700EF5C1B /* SceneDelegate.swift in Sources */,
 				0425CB8A2C4257B800B94F4D /* City.swift in Sources */,
+				047EB4D22C491D5200612562 /* SelectLocationMapViewModel.swift in Sources */,
 				04671F882C3FE06D00EF5C1B /* OpenWeatherManager.swift in Sources */,
 				0425CB822C417C9A00B94F4D /* FiveDaysTableViewCell.swift in Sources */,
 				047EB4C92C47929C00612562 /* SelectLocationMapView.swift in Sources */,
@@ -499,6 +511,7 @@
 				DEVELOPMENT_TEAM = "";
 				GENERATE_INFOPLIST_FILE = YES;
 				INFOPLIST_FILE = OpenWeather/Info.plist;
+				INFOPLIST_KEY_NSLocationWhenInUseUsageDescription = "사용자의 정확한 위치 확인을 위해 위치 정보를 사용합니다.";
 				INFOPLIST_KEY_UIApplicationSupportsIndirectInputEvents = YES;
 				INFOPLIST_KEY_UILaunchStoryboardName = LaunchScreen;
 				INFOPLIST_KEY_UISupportedInterfaceOrientations = UIInterfaceOrientationPortrait;
@@ -531,6 +544,7 @@
 				DEVELOPMENT_TEAM = "";
 				GENERATE_INFOPLIST_FILE = YES;
 				INFOPLIST_FILE = OpenWeather/Info.plist;
+				INFOPLIST_KEY_NSLocationWhenInUseUsageDescription = "사용자의 정확한 위치 확인을 위해 위치 정보를 사용합니다.";
 				INFOPLIST_KEY_UIApplicationSupportsIndirectInputEvents = YES;
 				INFOPLIST_KEY_UILaunchStoryboardName = LaunchScreen;
 				INFOPLIST_KEY_UISupportedInterfaceOrientations = UIInterfaceOrientationPortrait;
