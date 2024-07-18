@@ -59,7 +59,6 @@ final class MainViewModel {
             guard let city = self.inputCityList.value.filter({ $0.id == id }).first else { return }
             self.intputCity.value = city
             self.outputMapCoord.value = (city.coord.lat, city.coord.lon)
-            
             self.callWeather()
         }
         

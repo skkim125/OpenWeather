@@ -63,8 +63,7 @@ final class MainViewController: UIViewController {
         
         return cv
     }()
-    
-    let toolBar = UIToolbar()
+    private let mainBottomView = MainBottomView()
     
     private let userdefaultsManager = UserDefaultsManager.shared
     private var viewModel = MainViewModel()
@@ -106,17 +105,16 @@ final class MainViewController: UIViewController {
             
             let marker = MKPointAnnotation()
             marker.coordinate = CLLocationCoordinate2D(latitude: coord.0 ?? 0.0, longitude: coord.1 ?? 0.0)
-            
             marker.title = self.viewModel.intputCity.value?.name ?? ""
             self.mapView.addAnnotation(marker)
         }
         
-//        viewModel.outputShowAlert.bind { [weak self] show in
-//            guard let self = self else { return }
-//            if show {
-//                self.showAlert()
-//            }
-//        }
+        viewModel.outputShowAlert.bind { [weak self] show in
+            guard let self = self else { return }
+            if show {
+                self.showAlert()
+            }
+        }
     }
     
     private func configureNavigationBar() {
@@ -167,7 +165,7 @@ final class MainViewController: UIViewController {
         currentLocationView.addSubview(mapView)
         
         tableStackView.addArrangedSubview(weatherDeatailCollectionView)
-        view.addSubview(toolBar)
+        view.addSubview(mainBottomView)
     }
     
     private func configureLayout() {
@@ -190,11 +188,11 @@ final class MainViewController: UIViewController {
         
         threeHoursView.snp.makeConstraints { make in
             make.horizontalEdges.equalTo(tableStackView)
-            make.height.equalTo(160)
+            make.height.equalTo(180)
         }
         
         threeHoursCollectionView.snp.makeConstraints { make in
-            make.top.equalTo(threeHoursView.divider.snp.bottom).offset(10)
+            make.top.equalTo(threeHoursView.divider.snp.bottom).offset(5)
             make.horizontalEdges.equalTo(threeHoursView.snp.horizontalEdges).inset(20)
             make.bottom.equalTo(threeHoursView.snp.bottom).inset(10)
         }
@@ -225,10 +223,10 @@ final class MainViewController: UIViewController {
             make.horizontalEdges.bottom.equalTo(currentLocationView).inset(20)
         }
         
-        toolBar.snp.makeConstraints { make in
+        mainBottomView.snp.makeConstraints { make in
             make.top.equalTo(scrollView.snp.bottom)
-            make.bottom.equalTo(view).inset(30)
-            make.height.equalTo(50)
+            make.bottom.equalTo(view)
+            make.height.equalTo(60)
             make.horizontalEdges.equalTo(view)
         }
     }
@@ -241,18 +239,10 @@ final class MainViewController: UIViewController {
         tableStackView.axis = .vertical
         tableStackView.spacing = 20
         
-        
-        let mapButton = UIBarButtonItem(image: UIImage(systemName: "map"), style: .plain, target: self, action: #selector(mapbuttonclicked))
-        mapButton.tintColor = .black
-        let cityListButton = UIBarButtonItem(image: UIImage(systemName: "list.bullet"), style: .plain, target: self, action: #selector(cityListButtonClicked))
-        cityListButton.tintColor = .black
-        let flexibleSpace = UIBarButtonItem(barButtonSystemItem: .flexibleSpace, target: self, action: nil)
-        toolBar.items = [mapButton, flexibleSpace, cityListButton]
-        toolBar.isTranslucent = true
-        toolBar.barTintColor = #colorLiteral(red: 0.9494348168, green: 0.9246538877, blue: 0.9809295535, alpha: 1)
-        
+        mainBottomView.mapButton.addTarget(self, action: #selector(mapbuttonclicked), for: .touchUpInside)
+        mainBottomView.cityListButton.addTarget(self, action: #selector(cityListButtonClicked), for: .touchUpInside)
+        mainBottomView.backgroundColor = #colorLiteral(red: 0.9494348168, green: 0.9246538877, blue: 0.9809295535, alpha: 1)
     }
-    
 }
 
 extension MainViewController: UICollectionViewDelegate, UICollectionViewDataSource, UICollectionViewDelegateFlowLayout {

@@ -105,9 +105,9 @@
 			isa = PBXGroup;
 			children = (
 				0425CB7F2C41664E00B94F4D /* CurrentWeatherView.swift */,
-				0425CB832C418AB500B94F4D /* MainBottomView.swift */,
 				04671F942C410E6700EF5C1B /* WeatherDetailView.swift */,
 				04671F962C410EB900EF5C1B /* DividerLine.swift */,
+				0425CB832C418AB500B94F4D /* MainBottomView.swift */,
 			);
 			path = CustomView;
 			sourceTree = "<group>";

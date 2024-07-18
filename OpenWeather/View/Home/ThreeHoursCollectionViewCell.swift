@@ -82,7 +82,8 @@ final class ThreeHoursCollectionViewCell: UICollectionViewCell {
             make.top.equalTo(weatherImgView.snp.bottom).offset(10)
             make.horizontalEdges.equalTo(contentView.safeAreaLayoutGuide)
             make.centerX.equalTo(contentView.snp.centerX)
-            make.bottom.equalTo(contentView.safeAreaLayoutGuide).inset(20)
+            make.height.equalTo(20)
+            make.bottom.equalTo(contentView.safeAreaLayoutGuide).inset(15)
         }
     }
     
