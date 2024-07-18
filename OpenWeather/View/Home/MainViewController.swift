@@ -11,7 +11,7 @@ import SnapKit
 
 final class MainViewController: UIViewController {
     private let scrollView = UIScrollView()
-    private lazy var currentWeatherView = CurrentWeatherView(viewModel: viewModel)
+    private lazy var currentWeatherView = CurrentWeatherView()
     private let tableStackView = UIStackView()
     
     private let threeHoursView = WeatherDetailView(image: "calendar", title: "3시간 간격의 일기예보")
@@ -88,15 +88,14 @@ final class MainViewController: UIViewController {
     
     private func bindData() {
         
-        viewModel.outputSubWeather.bind { [weak self] _ in
+        viewModel.outputNetworkingComplete.bind { [weak self] isComplete in
             guard let self = self else { return }
-            self.threeHoursCollectionView.reloadData()
-            self.weatherDeatailCollectionView.reloadData()
-        }
-        
-        viewModel.outputFiveDays.bind { [weak self] _ in
-            guard let self = self else { return }
-            self.fiveDaysViewTableView.reloadData()
+            if isComplete {
+                self.currentWeatherView.bindData(viewModel: viewModel)
+                self.threeHoursCollectionView.reloadData()
+                self.weatherDeatailCollectionView.reloadData()
+                self.fiveDaysViewTableView.reloadData()
+            }
         }
         
         viewModel.outputMapCoord.bind { [weak self] coord in
@@ -210,7 +209,7 @@ final class MainViewController: UIViewController {
         
         weatherDeatailCollectionView.snp.makeConstraints { make in
             make.horizontalEdges.equalTo(view.safeAreaLayoutGuide).inset(20)
-            make.height.equalTo(350)
+            make.height.equalTo(380)
         }
         
         currentLocationView.snp.makeConstraints { make in

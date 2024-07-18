@@ -42,16 +42,14 @@ final class CurrentWeatherView: UIStackView {
         return label
     }()
     
-    init(viewModel: MainViewModel) {
+    init() {
         super.init(frame: .zero)
         
         configureHierarchy()
         configureLayout()
-        bindData(viewModel: viewModel)
-        
     }
     
-    private func bindData(viewModel: MainViewModel) {
+    func bindData(viewModel: MainViewModel) {
         viewModel.intputCity.bind { [weak self] city in
             guard let self = self else { return }
             self.cityNameLabel.text = city?.name ?? ""

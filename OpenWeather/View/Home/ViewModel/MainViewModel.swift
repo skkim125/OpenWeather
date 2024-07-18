@@ -18,28 +18,29 @@ final class MainViewModel {
     var inputCityList: Observable<[City]> = Observable([])
     
     // MARK: Output
-    // OpenWeatherAPI 통신 뷰모델
+    // OpenWeatherAPI 통신 관련 뷰모델
     var outputCurrentWeather: Observable<Weather?> = Observable(nil) // 출력할 현재 날씨
     var outputSubWeather: Observable<SubWeather?> = Observable(nil) // 출력할 서브 날씨
+    var outputNetworkingComplete: Observable<Bool> = Observable(false) // 네트워크 비동기 통신 완료 시점
     
     // threeHoursView 표시 뷰모델
-    var outputCurrentTemperature: Observable<String> = Observable("")
-    var outputMaxAndMinTemperature: Observable<String> = Observable("")
-    var outputWeatherOverview: Observable<String?> = Observable(nil)
+    var outputCurrentTemperature: Observable<String> = Observable("") // 현재 위치의 온도
+    var outputMaxAndMinTemperature: Observable<String> = Observable("") // 현재 위치의 최고/최저 온도
+    var outputWeatherOverview: Observable<String?> = Observable(nil) // 현재 위치의 날씨 설명
     
     // fiveDaysView 표시 뷰모델
-    var outputFiveDays: Observable<[String]> = Observable([])
-    var outputMinMaxTempOfDay: Observable<[String: (Weather, Weather)]> = Observable([:])
+    var outputFiveDays: Observable<[String]> = Observable([]) // 5일 배열
+    var outputMinMaxTempOfDay: Observable<[String: (Weather, Weather)]> = Observable([:]) // 5일간의 최고/최저 온도 딕셔너리
     
     // weatherDeatailCollectionView 표시 뷰모델
-    var outputWindSpeed: Observable<String?> = Observable(nil)
-    var outputCloudy: Observable<String?> = Observable(nil)
-    var outputPressure: Observable<String?> = Observable(nil)
-    var outputHumidity: Observable<String?> = Observable(nil)
+    var outputWindSpeed: Observable<String?> = Observable(nil) // 현재 위치의 풍속
+    var outputCloudy: Observable<String?> = Observable(nil) // 현재 위치의 구름 비율
+    var outputPressure: Observable<String?> = Observable(nil) // 현재 위치의 기압
+    var outputHumidity: Observable<String?> = Observable(nil) // 현재 위치의 습도
     
-    // 맵 표시 및 네트워크 연결 관련 alert 표시
-    var outputMapCoord: Observable<(Double?, Double?)> = Observable((nil, nil))
-    var outputShowAlert: Observable<Bool> = Observable(false)
+    // 기타
+    var outputMapCoord: Observable<(Double?, Double?)> = Observable((nil, nil)) // 맵뷰에 표시할 위/경도
+    var outputShowAlert: Observable<Bool> = Observable(false) // 네트워크 연결에 대한 알럿 표시
     
     init() {
         print("mainviewmodel init")
@@ -100,6 +101,9 @@ final class MainViewModel {
     }
     
     private func callWeather() {
+        let group = DispatchGroup()
+        
+        group.enter()
         owManager.callRequest(api: .currentURL(inputCityID.value), requestAPIType: Weather.self) { [weak self] response in
             guard let self = self else { return }
             switch response {
@@ -107,11 +111,12 @@ final class MainViewModel {
                 self.outputCurrentWeather.value = data
                 self.outputShowAlert.value = false
             case .failure(let error):
-                print(error)
                 self.outputShowAlert.value = true
             }
+            group.leave()
         }
         
+        group.enter()
         owManager.callRequest(api: .subWeatherURL(inputCityID.value), requestAPIType: SubWeather.self) { [weak self] response in
             
             guard let self = self else { return }
@@ -129,6 +134,11 @@ final class MainViewModel {
                 print(error)
                 self.outputShowAlert.value = true
             }
+            group.leave()
+        }
+        
+        group.notify(queue: .main) {
+            self.outputNetworkingComplete.value = true
         }
     }
     
