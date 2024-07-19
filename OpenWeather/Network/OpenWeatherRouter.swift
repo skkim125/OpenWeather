@@ -28,9 +28,9 @@ enum OpenWeatherRouter {
                 "lang": "kr"
             ]
             
-        case .locationURL(let lan, let lon):
+        case .locationURL(let lat, let lon):
             return [
-                "lan": "\(lan)",
+                "lat": "\(lat)",
                 "lon": "\(lon)",
                 "appid": "\(OpenWeatherAPI.key)",
                 "units": "metric",

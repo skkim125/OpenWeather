@@ -7,9 +7,9 @@
 
 import Foundation
 
-struct City: Decodable {
+struct City: Codable {
     let id: Int
-    let name: String
+    var name: String
     let country: String
-    let coord: Coord
+    var coord: Coord
 }

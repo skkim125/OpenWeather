@@ -19,18 +19,21 @@ class SelectLocationMapView: UIViewController {
     }()
     
     private let locationManager = CLLocationManager()
-    private var coordinate: CLLocationCoordinate2D?
+    let viewModel = SelectLocationMapViewModel()
+    var moveData: ((City)-> Void)?
     
     override func viewDidLoad() {
         super.viewDidLoad()
         
         view.backgroundColor = .systemBackground
+        
         checkDeiviceLocationAuthorization()
         configureNavigationBar()
         configureHierarchy()
         configureLayout()
         configureView()
         convertCoord()
+        bindData()
     }
     
     private func configureNavigationBar() {
@@ -45,8 +48,9 @@ class SelectLocationMapView: UIViewController {
     }
     
     @objc private func selectButtonClicked() {
-        showTwoButtonAlert(title: "해당 위치의", message: "의 날씨를 확인하시겠습니까?", checkButtonTitle: "저장") {
-            print(self.mapView.annotations.first!.coordinate)
+        showTwoButtonAlert(title: "해당 위치의 날씨를 확인하시겠습니까?", message: nil, checkButtonTitle: "저장") { [weak self] in
+            guard let self = self else { return }
+            self.viewModel.inputselectedLocation.value = true
         }
     }
     
@@ -64,6 +68,21 @@ class SelectLocationMapView: UIViewController {
     
     private func configureView() {
         locationManager.delegate = self
+    }
+    
+    func bindData() {
+        viewModel.outputLocation.bind { city in
+            self.setRegionLocation(center: CLLocationCoordinate2D(latitude: city.coord.lat, longitude: city.coord.lon))
+        }
+        
+        viewModel.inputselectedLocation.bind { isSelected in
+            if isSelected {
+                self.moveData?(self.viewModel.outputLocation.value)
+                self.viewModel.outputSearchWeather.value = ()
+                print("선택한 좌표: \(self.viewModel.outputLocation.value)")
+                self.dismiss(animated: true)
+            }
+        }
     }
     
     func checkDeiviceLocationAuthorization() {
@@ -90,8 +109,7 @@ class SelectLocationMapView: UIViewController {
             locationManager.desiredAccuracy = kCLLocationAccuracyNearestTenMeters
             locationManager.requestWhenInUseAuthorization()
         case .denied:
-            serRegionAndAnnotation(center: self.coordinate ?? CLLocationCoordinate2D(latitude: 37.65493, longitude: 127.04761))
-            
+            print("위치 허용")
         case .authorizedWhenInUse:
             locationManager.startUpdatingLocation()
         default:
@@ -99,19 +117,27 @@ class SelectLocationMapView: UIViewController {
         }
     }
     
-    func serRegionAndAnnotation(center: CLLocationCoordinate2D) {
+    func setRegionLocation(center: CLLocationCoordinate2D) {
         
         let region = MKCoordinateRegion(center: center, latitudinalMeters: 500, longitudinalMeters: 500)
         mapView.setRegion(region, animated: true)
-        addAnnotation(center: center, title: "선택한 좌표")
+        addAnnotation(center: center)
+        
     }
     
-    func addAnnotation(center: CLLocationCoordinate2D, title: String?) {
-        let annotaion = MKPointAnnotation()
-        annotaion.coordinate = CLLocationCoordinate2D(latitude: center.latitude, longitude: center.longitude)
-        annotaion.title = title
+    func addAnnotation(center: CLLocationCoordinate2D) {
+        let annotation = MKPointAnnotation()
+        annotation.coordinate = CLLocationCoordinate2D(latitude: center.latitude, longitude: center.longitude)
         
-        mapView.addAnnotation(annotaion)
+        
+        let geocoder = CLGeocoder()
+        geocoder.reverseGeocodeLocation(CLLocation(latitude: annotation.coordinate.latitude, longitude: annotation.coordinate.longitude), preferredLocale: Locale(identifier: "ko_KR")) { placemarks, error in
+            if let placemark = placemarks?.first {
+                annotation.title = [placemark.locality, placemark.name].compactMap { $0 }.joined(separator: " ")
+            }
+        }
+        
+        mapView.addAnnotation(annotation)
     }
     
     func convertCoord() {
@@ -120,14 +146,26 @@ class SelectLocationMapView: UIViewController {
     }
     
     @objc func touchMapView(_ view: UITapGestureRecognizer) {
+        mapView.removeAnnotations(mapView.annotations)
+        
         let location: CGPoint = view.location(in: mapView)
         let mapPoint: CLLocationCoordinate2D = mapView.convert(location, toCoordinateFrom: mapView)
         
-        let annotaion = MKPointAnnotation()
-        annotaion.coordinate = CLLocationCoordinate2D(latitude: mapPoint.latitude, longitude: mapPoint.longitude)
-        annotaion.title = "클릭한 좌표"
-        mapView.removeAnnotations(mapView.annotations)
-        mapView.addAnnotation(annotaion)
+        let annotation = MKPointAnnotation()
+        annotation.coordinate = CLLocationCoordinate2D(latitude: mapPoint.latitude, longitude: mapPoint.longitude)
+        
+        
+        let geocoder = CLGeocoder()
+        geocoder.reverseGeocodeLocation(CLLocation(latitude: annotation.coordinate.latitude, longitude: annotation.coordinate.longitude), preferredLocale: Locale(identifier: "ko_KR")) { placemarks, error in
+            if let placemark = placemarks?.first {
+                annotation.title = [placemark.locality, placemark.name].compactMap { $0 }.joined(separator: " ")
+                self.viewModel.inputLocationName.value = [placemark.locality, placemark.name].compactMap { $0 }.joined(separator: " ")
+                
+                self.viewModel.inputLocation.value = City(id: -1, name: self.viewModel.inputLocationName.value, country: "", coord: Coord(lat: Double(mapPoint.latitude), lon: Double(mapPoint.longitude)))
+            }
+        }
+        
+        mapView.addAnnotation(annotation)
     }
 }
 
@@ -135,9 +173,8 @@ extension SelectLocationMapView: CLLocationManagerDelegate {
     
     func locationManager(_ manager: CLLocationManager, didUpdateLocations locations: [CLLocation]) {
         if let coordinate = locations.last?.coordinate {
-            self.coordinate = coordinate
-            
-            serRegionAndAnnotation(center: self.coordinate ?? CLLocationCoordinate2D(latitude: 37.65493, longitude: 127.04761))
+            self.setRegionLocation(center: CLLocationCoordinate2D(latitude: coordinate.latitude, longitude: coordinate.longitude))
+            viewModel.inputLocation.value = City(id: -1, name: "나의 위치", country: "", coord: Coord(lat: coordinate.latitude, lon: coordinate.longitude))
         }
         
         locationManager.stopUpdatingLocation()

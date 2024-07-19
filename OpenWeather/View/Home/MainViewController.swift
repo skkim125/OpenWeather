@@ -82,10 +82,6 @@ final class MainViewController: UIViewController {
         bindData()
     }
     
-    deinit {
-        print("MainViewController Deinit")
-    }
-    
     private func bindData() {
         
         viewModel.outputNetworkingComplete.bind { [weak self] isComplete in
@@ -95,6 +91,7 @@ final class MainViewController: UIViewController {
                 self.threeHoursCollectionView.reloadData()
                 self.weatherDeatailCollectionView.reloadData()
                 self.fiveDaysViewTableView.reloadData()
+                self.viewModel.outputNetworkingComplete.value = false
             }
         }
         
@@ -104,7 +101,7 @@ final class MainViewController: UIViewController {
             
             let marker = MKPointAnnotation()
             marker.coordinate = CLLocationCoordinate2D(latitude: coord.0 ?? 0.0, longitude: coord.1 ?? 0.0)
-            marker.title = self.viewModel.intputCity.value?.name ?? ""
+            marker.title = self.viewModel.inputCity.value?.name ?? ""
             self.mapView.addAnnotation(marker)
         }
         
@@ -122,23 +119,31 @@ final class MainViewController: UIViewController {
     }
     
     @objc func mapbuttonclicked() {
-        let nav = UINavigationController(rootViewController: SelectLocationMapView())
+        let vc = SelectLocationMapView()
+        vc.moveData = { [weak self] city in
+            guard let self = self else { return }
+            self.viewModel.inputCity.value = city
+            self.userdefaultsManager.savedCity = city
+            self.scrollView.contentOffset = CGPoint(x: 0, y: 0)
+            print("self.userdefaultsManager.savedCity = \(self.userdefaultsManager.savedCity)")
+        }
+        
+        let nav = UINavigationController(rootViewController: vc)
+        nav.modalPresentationStyle = .fullScreen
+        
         present(nav, animated: true)
     }
     
     @objc private func cityListButtonClicked() {
 
         let vc = CityListViewController()
-        vc.viewModel.inputCityList = viewModel.inputCityList
-        vc.viewModel.inputCity = viewModel.intputCity
+        vc.viewModel.inputCityList.value = viewModel.inputCityList.value
+        vc.viewModel.inputCity.value = viewModel.inputCity.value
         vc.moveData = { [weak self] city in
             guard let self = self else { return }
-            self.viewModel.inputCityID.value = city.id
-            self.userdefaultsManager.savedID = city.id
+            self.viewModel.inputCity.value = city
+            self.userdefaultsManager.savedCity = city
             self.scrollView.contentOffset = CGPoint(x: 0, y: 0)
-            self.threeHoursCollectionView.reloadData()
-            self.fiveDaysViewTableView.reloadData()
-            self.weatherDeatailCollectionView.reloadData()
         }
         
         navigationController?.pushViewController(vc, animated: true)
@@ -175,7 +180,8 @@ final class MainViewController: UIViewController {
         }
         
         currentWeatherView.snp.makeConstraints { make in
-            make.top.horizontalEdges.equalTo(scrollView)
+            make.top.equalTo(scrollView)
+            make.horizontalEdges.equalTo(scrollView).inset(20)
             make.centerX.equalTo(scrollView)
         }
         

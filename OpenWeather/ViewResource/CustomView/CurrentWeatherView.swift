@@ -14,7 +14,6 @@ final class CurrentWeatherView: UIStackView {
         label.textColor = .black.withAlphaComponent(0.8)
         label.font = .systemFont(ofSize: 40)
         label.textAlignment = .center
-        label.numberOfLines = 2
         
         return label
     }()
@@ -51,9 +50,10 @@ final class CurrentWeatherView: UIStackView {
     }
     
     func bindData(viewModel: MainViewModel) {
-        viewModel.intputCity.bind { [weak self] city in
+        
+        viewModel.outputCityName.bind { [weak self] cityName in
             guard let self = self else { return }
-            self.cityNameLabel.text = city?.name ?? ""
+            self.cityNameLabel.text = cityName
         }
         
         viewModel.outputCurrentTemperature.bind { [weak self] ct in
@@ -82,14 +82,12 @@ final class CurrentWeatherView: UIStackView {
     private func configureLayout() {
         cityNameLabel.snp.makeConstraints { make in
             make.top.equalTo(self.snp.top)
-            make.height.equalTo(60)
-            make.centerX.equalTo(self.snp.centerX)
-            make.horizontalEdges.equalTo(self.safeAreaLayoutGuide).inset(20)
+            make.height.equalTo(50)
+            make.horizontalEdges.equalTo(self.safeAreaLayoutGuide)
         }
         
         currentTemperatureLabel.snp.makeConstraints { make in
-            make.height.equalTo(90)
-            make.centerX.equalTo(self.snp.centerX)
+            make.height.equalTo(70)
         }
         
         weatherOverviewLabel.snp.makeConstraints { make in

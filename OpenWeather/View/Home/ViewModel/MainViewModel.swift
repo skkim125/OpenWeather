@@ -13,8 +13,7 @@ final class MainViewModel {
     
     // MARK: Input
     // 도시 뷰모델
-    var inputCityID: Observable<Int> = Observable(0)
-    var intputCity: Observable<City?> = Observable(nil)
+    var inputCity: Observable<City?> = Observable(nil)
     var inputCityList: Observable<[City]> = Observable([])
     
     // MARK: Output
@@ -24,6 +23,7 @@ final class MainViewModel {
     var outputNetworkingComplete: Observable<Bool> = Observable(false) // 네트워크 비동기 통신 완료 시점
     
     // threeHoursView 표시 뷰모델
+    var outputCityName: Observable<String> = Observable("")
     var outputCurrentTemperature: Observable<String> = Observable("") // 현재 위치의 온도
     var outputMaxAndMinTemperature: Observable<String> = Observable("") // 현재 위치의 최고/최저 온도
     var outputWeatherOverview: Observable<String?> = Observable(nil) // 현재 위치의 날씨 설명
@@ -53,18 +53,23 @@ final class MainViewModel {
     
     func transform() {
         fetchJson()
-        setInputCityID()
+        setInputCity()
+        print(userdefaultsManager.savedCity)
+        print(inputCity.value)
         
-        inputCityID.bind { [weak self] id in
+        inputCity.bind { [weak self] city in
+            print("바인딩 됨")
             guard let self = self else { return }
-            guard let city = self.inputCityList.value.filter({ $0.id == id }).first else { return }
-            self.intputCity.value = city
-            self.outputMapCoord.value = (city.coord.lat, city.coord.lon)
-            self.callWeather()
+            self.outputMapCoord.value = (city?.coord.lat ?? 0.0, city?.coord.lon ?? 0.0)
+            guard let id = self.inputCity.value?.id else { return }
+            self.callWeather(id: (id >= 0) ? id : nil)
         }
         
         outputCurrentWeather.bind { [weak self] current in
             guard let self = self else { return }
+            
+            self.outputCityName.value = inputCity.value?.name ?? "--"
+            
             self.outputCurrentTemperature.value = current?.weatherDetail.tempStr ?? "--º"
             
             self.outputWeatherOverview.value = current?.weatherImage.first?.description ?? "--"
@@ -91,33 +96,36 @@ final class MainViewModel {
         }
     }
     
-    private func setInputCityID() {
-        if userdefaultsManager.savedID != 0 {
-            inputCityID.value = userdefaultsManager.savedID
-            
+    private func setInputCity() {
+        if userdefaultsManager.savedCity.id == 0 {
+            guard let city = self.inputCityList.value.filter({ $0.id == 1835847 }).first else { return }
+            inputCity.value = city
         } else {
-            inputCityID.value = 1835847
+            inputCity.value = userdefaultsManager.savedCity
         }
     }
     
-    private func callWeather() {
+    private func callWeather(id: Int?) {
+        let currentApi: OpenWeatherRouter = (id != nil) ? .currentURL(inputCity.value?.id ?? 0) : .locationURL(inputCity.value?.coord.lat ?? 0.0, inputCity.value?.coord.lon ?? 0.0)
+        let subWeatherApi: OpenWeatherRouter = (id != nil) ? .subWeatherURL(inputCity.value?.id ?? 0) : .locationURL(inputCity.value?.coord.lat ?? 0.0, inputCity.value?.coord.lon ?? 0.0)
+        
         let group = DispatchGroup()
         
         group.enter()
-        owManager.callRequest(api: .currentURL(inputCityID.value), apiType: .current, requestAPIType: Weather.self) { [weak self] response in
+        owManager.callRequest(api: currentApi, apiType: .current, requestAPIType: Weather.self) { [weak self] response in
             guard let self = self else { return }
             switch response {
             case .success(let data):
                 self.outputCurrentWeather.value = data
                 self.outputShowAlert.value = false
-            case .failure(let error):
+            case .failure(_):
                 self.outputShowAlert.value = true
             }
             group.leave()
         }
         
         group.enter()
-        owManager.callRequest(api: .subWeatherURL(inputCityID.value), apiType: .subWeather, requestAPIType: SubWeather.self) { [weak self] response in
+        owManager.callRequest(api: subWeatherApi, apiType: .subWeather, requestAPIType: SubWeather.self) { [weak self] response in
             
             guard let self = self else { return }
             switch response {

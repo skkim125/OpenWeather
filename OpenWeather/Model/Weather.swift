@@ -53,9 +53,9 @@ struct Weather: Decodable {
     }
 }
 
-struct Coord: Decodable {
-    let lat: Double
-    let lon: Double
+struct Coord: Codable {
+    var lat: Double
+    var lon: Double
 }
 
 struct SubWeather: Decodable {

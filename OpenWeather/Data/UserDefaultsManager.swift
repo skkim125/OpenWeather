@@ -14,15 +14,28 @@ final class UserDefaultsManager {
     private let userdefaults = UserDefaults.standard
     
     enum Key: String {
-        case id
+        case city
     }
     
-    var savedID: Int {
+    var savedCity: City {
         get {
-            return userdefaults.integer(forKey: Key.id.rawValue)
+            let decoder: JSONDecoder = JSONDecoder()
+
+            guard let data = userdefaults.data(forKey: Key.city.rawValue), let city = try? decoder.decode(City.self, from: data) else {
+                return City(id: 0, name: "", country: "", coord: Coord(lat: 0.0, lon: 0.0))
+            }
+            
+            return city
         }
-        set {
-            userdefaults.setValue(newValue, forKey: Key.id.rawValue)
+        
+        set{
+            let encoder: JSONEncoder = JSONEncoder()
+            
+            if let encodedCity = try? encoder.encode(newValue) {
+                userdefaults.set(encodedCity, forKey: Key.city.rawValue)
+            } else {
+                print("저장 실패")
+            }
         }
     }
 }

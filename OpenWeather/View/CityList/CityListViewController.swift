@@ -108,21 +108,11 @@ extension CityListViewController: UITableViewDelegate, UITableViewDataSource {
     
     func tableView(_ tableView: UITableView, didSelectRowAt indexPath: IndexPath) {
         let data = viewModel.outputfilterList.value[indexPath.row]
-        showAlert(city: data)
-    }
-    
-    func showAlert(city: City) {
-        let cancel = UIAlertAction(title: "취소", style: .destructive)
-        let pickCity = UIAlertAction(title: "확인", style: .default) { _ in
-            self.moveData?(city)
+        showTwoButtonAlert(title: "\(data.name)의 날씨로 이동하시겠습니까?", message: nil, checkButtonTitle: "확인") { [weak self] in
+            guard let self = self else { return }
+            self.moveData?(data)
             self.navigationController?.popViewController(animated: true)
         }
-        
-        let alert = UIAlertController(title: "\(city.name)의 날씨로 이동하시겠습니까?", message: nil, preferredStyle: .alert)
-        alert.addAction(cancel)
-        alert.addAction(pickCity)
-        
-        present(alert, animated: true)
     }
 }
 
