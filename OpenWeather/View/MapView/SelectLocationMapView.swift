@@ -12,11 +12,7 @@ import SnapKit
 
 final class SelectLocationMapView: UIViewController {
     // MARK: - Views
-    private lazy var mapView = {
-        let mapView = MKMapView()
-        
-        return mapView
-    }()
+    private let mapView = MKMapView()
     
     // MARK: - Properties
     private let locationManager = CLLocationManager()
@@ -29,7 +25,7 @@ final class SelectLocationMapView: UIViewController {
         
         view.backgroundColor = .systemBackground
         
-        checkDeiviceLocationAuthorization()
+        checkDeviceLocationAuthorization()
         
         configureNavigationBar()
         configureHierarchy()
@@ -65,27 +61,29 @@ final class SelectLocationMapView: UIViewController {
     
     // MARK: - Data Binding Functions
     private func bindData() {
-        viewModel.outputLocation.bind { city in
+        viewModel.outputLocation.bind { [weak self] city in
+            guard let self = self else { return }
             self.setRegionLocation(center: CLLocationCoordinate2D(latitude: city.coord.lat, longitude: city.coord.lon))
+            self.addAnnotation(center: CLLocationCoordinate2D(latitude: city.coord.lat, longitude: city.coord.lon), title: city.name)
         }
         
-        viewModel.inputselectedLocation.bind { isSelected in
+        viewModel.inputselectedLocation.bind { [weak self] isSelected in
+            guard let self = self else { return }
+            
             if isSelected {
                 self.moveData?(self.viewModel.outputLocation.value)
-                self.viewModel.outputSearchWeather.value = ()
-                print("선택한 좌표: \(self.viewModel.outputLocation.value)")
                 self.dismiss(animated: true)
             }
         }
     }
     
     // MARK: - Functions
-    private func checkDeiviceLocationAuthorization() {
+    private func checkDeviceLocationAuthorization() {
         DispatchQueue.global().async {
             if CLLocationManager.locationServicesEnabled() {
                 self.checkCurrentLocationAuthorization()
             } else {
-                print("디바이스 위치 권한을 허용해주세요")
+                print("위치 권한 거부됨")
             }
         }
     }
@@ -104,7 +102,11 @@ final class SelectLocationMapView: UIViewController {
             locationManager.desiredAccuracy = kCLLocationAccuracyNearestTenMeters
             locationManager.requestWhenInUseAuthorization()
         case .denied:
-            print("위치 허용")
+            self.showTwoButtonAlert(title: "위치 서비스를 이용할 수 없습니다.", message: "'설정 > 개인정보 보호 및 보안'에서 위치 서비스를 허용주세요.", checkButtonTitle: "설정하러 가기") {
+                if let deviceSetting = URL(string: UIApplication.openSettingsURLString) {
+                    UIApplication.shared.open(deviceSetting)
+                }
+            }
         case .authorizedWhenInUse:
             locationManager.startUpdatingLocation()
         default:
@@ -113,26 +115,25 @@ final class SelectLocationMapView: UIViewController {
     }
     
     private func setRegionLocation(center: CLLocationCoordinate2D) {
-        
         let region = MKCoordinateRegion(center: center, latitudinalMeters: 500, longitudinalMeters: 500)
         mapView.setRegion(region, animated: true)
-        addAnnotation(center: center)
-        
     }
     
-    private func addAnnotation(center: CLLocationCoordinate2D) {
+    private func addAnnotation(center: CLLocationCoordinate2D, title: String) {
         let annotation = MKPointAnnotation()
         annotation.coordinate = CLLocationCoordinate2D(latitude: center.latitude, longitude: center.longitude)
-        
-        
-        let geocoder = CLGeocoder()
-        geocoder.reverseGeocodeLocation(CLLocation(latitude: annotation.coordinate.latitude, longitude: annotation.coordinate.longitude), preferredLocale: Locale(identifier: "ko_KR")) { placemarks, error in
-            if let placemark = placemarks?.first {
-                annotation.title = [placemark.locality, placemark.name].compactMap { $0 }.joined(separator: " ")
-            }
-        }
-        
+        annotation.title = title
         mapView.addAnnotation(annotation)
+    }
+    
+    func convertGeocode(lat: CLLocationDegrees, lon: CLLocationDegrees) {
+        let geocoder = CLGeocoder()
+        geocoder.reverseGeocodeLocation(CLLocation(latitude: lat, longitude: lon), preferredLocale: Locale(identifier: "ko_KR")) { [weak self] placemarks, _ in
+            guard let self = self else { return }
+            guard let placemark = placemarks?.first else { return }
+            self.viewModel.inputLocationName.value = [placemark.locality, placemark.name].compactMap { $0 }.joined(separator: " ")
+            self.viewModel.inputLocation.value = City(id: -1, name: self.viewModel.inputLocationName.value, country: "", coord: Coord(lat: lat, lon: lon))
+        }
     }
     
     private func convertCoord() {
@@ -146,22 +147,8 @@ final class SelectLocationMapView: UIViewController {
         
         let location: CGPoint = view.location(in: mapView)
         let mapPoint: CLLocationCoordinate2D = mapView.convert(location, toCoordinateFrom: mapView)
-        
-        let annotation = MKPointAnnotation()
-        annotation.coordinate = CLLocationCoordinate2D(latitude: mapPoint.latitude, longitude: mapPoint.longitude)
-        
-        
-        let geocoder = CLGeocoder()
-        geocoder.reverseGeocodeLocation(CLLocation(latitude: annotation.coordinate.latitude, longitude: annotation.coordinate.longitude), preferredLocale: Locale(identifier: "ko_KR")) { placemarks, error in
-            if let placemark = placemarks?.first {
-                annotation.title = [placemark.locality, placemark.name].compactMap { $0 }.joined(separator: " ")
-                self.viewModel.inputLocationName.value = [placemark.locality, placemark.name].compactMap { $0 }.joined(separator: " ")
-                
-                self.viewModel.inputLocation.value = City(id: -1, name: self.viewModel.inputLocationName.value, country: "", coord: Coord(lat: Double(mapPoint.latitude), lon: Double(mapPoint.longitude)))
-            }
-        }
-        
-        mapView.addAnnotation(annotation)
+        convertGeocode(lat: mapPoint.latitude, lon: mapPoint.longitude)
+        setRegionLocation(center: mapPoint)
     }
     
     // MARK: - Button Functions
@@ -170,7 +157,7 @@ final class SelectLocationMapView: UIViewController {
     }
     
     @objc private func selectButtonClicked() {
-        showTwoButtonAlert(title: "해당 위치의 날씨를 확인하시겠습니까?", message: nil, checkButtonTitle: "저장") { [weak self] in
+        showTwoButtonAlert(title: "해당 위치의 날씨를 조회하시겠습니까?", message: nil, checkButtonTitle: "조회하기") { [weak self] in
             guard let self = self else { return }
             self.viewModel.inputselectedLocation.value = true
         }
@@ -182,24 +169,18 @@ extension SelectLocationMapView: CLLocationManagerDelegate {
     
     func locationManager(_ manager: CLLocationManager, didUpdateLocations locations: [CLLocation]) {
         if let coordinate = locations.last?.coordinate {
-            self.setRegionLocation(center: CLLocationCoordinate2D(latitude: coordinate.latitude, longitude: coordinate.longitude))
-            viewModel.inputLocation.value = City(id: -1, name: "나의 위치", country: "", coord: Coord(lat: coordinate.latitude, lon: coordinate.longitude))
+            addAnnotation(center: CLLocationCoordinate2D(latitude: coordinate.latitude, longitude: coordinate.longitude), title: "현재 위치")
+            viewModel.outputLocation.value = City(id: -1, name: "나의 위치", country: "", coord: Coord(lat: coordinate.latitude, lon: coordinate.longitude))
         }
         
         locationManager.stopUpdatingLocation()
     }
     
-    func locationManager(_ manager: CLLocationManager, didFailWithError error: any Error) {
-        print(#function)
-        print(error)
-    }
-    
     func locationManagerDidChangeAuthorization(_ manager: CLLocationManager) {
-        print(#function, "iOS 14+")
-        checkDeiviceLocationAuthorization()
+        checkDeviceLocationAuthorization()
     }
     
     func locationManager(_ manager: CLLocationManager, didChangeAuthorization status: CLAuthorizationStatus) {
-        print(#function, "iOS 14-")
+        checkDeviceLocationAuthorization()
     }
 }

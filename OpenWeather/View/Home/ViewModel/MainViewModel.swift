@@ -44,7 +44,6 @@ final class MainViewModel {
     var outputShowAlert: Observable<Bool> = Observable(false) // 네트워크 연결에 대한 알럿 표시
     
     init() {
-        print("mainviewmodel init")
         transform()
     }
     
@@ -53,7 +52,6 @@ final class MainViewModel {
         setInputCity()
         
         inputCity.bind { [weak self] city in
-            print("바인딩 됨")
             guard let self = self else { return }
             self.outputMapCoord.value = (city?.coord.lat ?? 0.0, city?.coord.lon ?? 0.0)
             guard let id = self.inputCity.value?.id else { return }

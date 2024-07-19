@@ -231,7 +231,6 @@ final class MainViewController: UIViewController {
             self.viewModel.inputCity.value = city
             self.userdefaultsManager.savedCity = city
             self.scrollView.contentOffset = CGPoint(x: 0, y: 0)
-            print("self.userdefaultsManager.savedCity = \(self.userdefaultsManager.savedCity)")
         }
         
         let nav = UINavigationController(rootViewController: vc)
