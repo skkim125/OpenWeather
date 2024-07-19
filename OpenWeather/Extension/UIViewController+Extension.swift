@@ -8,6 +8,7 @@
 import UIKit
 
 extension UIViewController {
+    // MARK: - Alert Functions
     func showOneButtonAlert(title: String, message: String?) {
         let alert = UIAlertController(title: title, message: message, preferredStyle: .alert)
         let back = UIAlertAction(title: "확인", style: .default)

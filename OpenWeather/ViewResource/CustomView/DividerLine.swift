@@ -9,7 +9,7 @@ import UIKit
 import SnapKit
 
 final class DividerLine: UIView {
-    
+    // MARK: Configurations
     init(color: UIColor) {
         super.init(frame: .zero)
         backgroundColor = color

@@ -8,15 +8,18 @@
 import Foundation
 
 final class UserDefaultsManager {
+    // MARK: - Singleton Instance
     static let shared = UserDefaultsManager()
     private init() { }
     
     private let userdefaults = UserDefaults.standard
     
+    // MARK: - Enum of Key
     enum Key: String {
         case city
     }
     
+    // MARK: - Properties
     var savedCity: City {
         get {
             let decoder: JSONDecoder = JSONDecoder()

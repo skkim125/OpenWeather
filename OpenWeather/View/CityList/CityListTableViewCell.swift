@@ -9,23 +9,37 @@ import UIKit
 import SnapKit
 
 final class CityListTableViewCell: UITableViewCell {
+    // MARK: - Views
     private let hashImageView = {
         let imageView = UIImageView(image: UIImage(systemName: "number"))
         imageView.contentMode = .scaleAspectFit
-        imageView.tintColor = .white
+        imageView.tintColor = .black
         
         return imageView
     }()
-    private let cityNameLabel = UILabel()
-    private let countryLabel = UILabel()
+    private let cityNameLabel = {
+        let label = UILabel()
+        label.textColor = .black
+        label.font = .boldSystemFont(ofSize: 16)
+        
+        return label
+    }()
+    private let countryLabel = {
+        let label = UILabel()
+        label.textColor = .darkGray
+        label.font = .boldSystemFont(ofSize: 14)
+        
+        return label
+    }()
     private let checkImageView = {
         let imageView = UIImageView(image: UIImage(systemName: "checkmark"))
         imageView.contentMode = .scaleAspectFit
-        imageView.tintColor = .red
+        imageView.tintColor = .darkGray
         
         return imageView
     }()
     
+    // MARK: - Configurations
     override init(style: UITableViewCell.CellStyle, reuseIdentifier: String?) {
         super.init(style: style, reuseIdentifier: reuseIdentifier)
         
@@ -70,18 +84,12 @@ final class CityListTableViewCell: UITableViewCell {
     }
     
     func configureView(city: City, isHidden: Bool) {
-        
         cityNameLabel.text = city.name
-        cityNameLabel.textColor = .white
-        cityNameLabel.font = .boldSystemFont(ofSize: 16)
-        
         countryLabel.text = city.country
-        countryLabel.textColor = .gray
-        countryLabel.font = .boldSystemFont(ofSize: 14)
-        
         checkImageView.isHidden = isHidden
     }
     
+    @available(*, unavailable)
     required init?(coder: NSCoder) {
         fatalError("init(coder:) has not been implemented")
     }

@@ -9,11 +9,14 @@ import Foundation
 import Alamofire
 
 final class OpenWeatherManager {
+    // MARK: - Singleton Instance
     static let shared = OpenWeatherManager()
     private init() { }
     
+    // MARK: - Typealias
     typealias CompletionHandler<T> = ((T?) -> Void)
     
+    // MARK: - Functions
     func callRequest<T: Decodable>(api: OpenWeatherRouter, apiType: OpenWeatherRouter.apiType,  requestAPIType: T.Type, completionHandler: @escaping (Result<T, Error>) -> Void) {
         guard let url = URL(string: OpenWeatherAPI.url + apiType.rawValue) else { return }
         

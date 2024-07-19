@@ -7,6 +7,7 @@
 
 import Foundation
 
+// MARK: - Weather
 struct Weather: Decodable {
     let dt: Int
     let weatherDetail: WeatherDetail
@@ -53,11 +54,13 @@ struct Weather: Decodable {
     }
 }
 
+// MARK: - Coordinate
 struct Coord: Codable {
     var lat: Double
     var lon: Double
 }
 
+// MARK: - 5D/3H Weather
 struct SubWeather: Decodable {
     let result: [Weather]
     let city: OWCity
@@ -93,11 +96,13 @@ struct SubWeather: Decodable {
     }
 }
 
+// MARK: - Weather(City)
 struct OWCity: Decodable {
     let name: String
     let coord: Coord
 }
 
+// MARK: - CurrentWeather
 struct WeatherDetail: Decodable {
     let temp: Double
     let feels_like: Double
@@ -111,15 +116,18 @@ struct WeatherDetail: Decodable {
     }
 }
 
+// MARK: - WeatherImage
 struct WeatherImage: Decodable {
     let description: String
     let icon: String
 }
 
+// MARK: - Wind
 struct Wind: Decodable {
     let speed: Double
 }
 
+// MARK: - Clouds
 struct Clouds: Decodable {
     var all: Double
 }

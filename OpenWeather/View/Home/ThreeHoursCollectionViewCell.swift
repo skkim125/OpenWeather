@@ -10,7 +10,8 @@ import Kingfisher
 import SnapKit
 
 final class ThreeHoursCollectionViewCell: UICollectionViewCell {
-    let dayLabel: UILabel = {
+    // MARK: - Views
+    private let dayLabel: UILabel = {
         let label = UILabel()
         label.textColor = .darkGray
         label.textAlignment = .center
@@ -18,7 +19,7 @@ final class ThreeHoursCollectionViewCell: UICollectionViewCell {
         
         return label
     }()
-    let timeLabel: UILabel = {
+    private let timeLabel: UILabel = {
         let label = UILabel()
         label.textColor = .black
         label.textAlignment = .center
@@ -26,13 +27,13 @@ final class ThreeHoursCollectionViewCell: UICollectionViewCell {
         
         return label
     }()
-    let weatherImgView: UIImageView = {
+    private let weatherImgView: UIImageView = {
         let imageView = UIImageView()
         imageView.contentMode = .scaleAspectFill
         
         return imageView
     }()
-    let temperatureLabel: UILabel = {
+    private let temperatureLabel: UILabel = {
         let label = UILabel()
         label.textColor = .black
         label.textAlignment = .center
@@ -41,6 +42,7 @@ final class ThreeHoursCollectionViewCell: UICollectionViewCell {
         return label
     }()
     
+    // MARK: - Configurations
     override init(frame: CGRect) {
         super.init(frame: .zero)
         
@@ -88,7 +90,6 @@ final class ThreeHoursCollectionViewCell: UICollectionViewCell {
     }
     
     func configureView(subWeather: Weather) {
-        
         dayLabel.text = subWeather.day
         timeLabel.text = subWeather.hour
         weatherImgView.kf.setImage(with: URL(string: subWeather.weatherImageURL))

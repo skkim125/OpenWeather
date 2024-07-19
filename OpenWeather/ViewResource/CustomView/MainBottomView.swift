@@ -9,9 +9,11 @@ import UIKit
 import SnapKit
 
 final class MainBottomView: UIView {
+    // MARK: - Views
     let mapButton = UIButton()
     let cityListButton = UIButton()
     
+    // MARK: - COnfigurations
     init() {
         super.init(frame: .zero)
         

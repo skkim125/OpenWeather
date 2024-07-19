@@ -10,32 +10,37 @@ import MapKit
 import CoreLocation
 import SnapKit
 
-class SelectLocationMapView: UIViewController {
-    
+final class SelectLocationMapView: UIViewController {
+    // MARK: - Views
     private lazy var mapView = {
         let mapView = MKMapView()
         
         return mapView
     }()
     
+    // MARK: - Properties
     private let locationManager = CLLocationManager()
-    let viewModel = SelectLocationMapViewModel()
+    private let viewModel = SelectLocationMapViewModel()
     var moveData: ((City)-> Void)?
     
+    // MARK: - Life Cycle
     override func viewDidLoad() {
         super.viewDidLoad()
         
         view.backgroundColor = .systemBackground
         
         checkDeiviceLocationAuthorization()
+        
         configureNavigationBar()
         configureHierarchy()
         configureLayout()
         configureView()
+        
         convertCoord()
         bindData()
     }
     
+    // MARK: - COnfigurtaions
     private func configureNavigationBar() {
         navigationItem.leftBarButtonItem = UIBarButtonItem(image: UIImage(systemName: "xmark"), style: .plain, target: self, action: #selector(backButtonClicked))
         navigationItem.title = "위치 선택하기"
@@ -43,23 +48,11 @@ class SelectLocationMapView: UIViewController {
         navigationItem.rightBarButtonItem?.setTitleTextAttributes([.font: UIFont.boldSystemFont(ofSize: 18)], for: .normal)
     }
     
-    @objc private func backButtonClicked() {
-        dismiss(animated: true)
-    }
-    
-    @objc private func selectButtonClicked() {
-        showTwoButtonAlert(title: "해당 위치의 날씨를 확인하시겠습니까?", message: nil, checkButtonTitle: "저장") { [weak self] in
-            guard let self = self else { return }
-            self.viewModel.inputselectedLocation.value = true
-        }
-    }
-    
     private func configureHierarchy() {
         view.addSubview(mapView)
     }
     
     private func configureLayout() {
-        
         mapView.snp.makeConstraints { make in
             make.top.equalTo(view.safeAreaLayoutGuide)
             make.bottom.horizontalEdges.equalTo(view)
@@ -70,7 +63,8 @@ class SelectLocationMapView: UIViewController {
         locationManager.delegate = self
     }
     
-    func bindData() {
+    // MARK: - Data Binding Functions
+    private func bindData() {
         viewModel.outputLocation.bind { city in
             self.setRegionLocation(center: CLLocationCoordinate2D(latitude: city.coord.lat, longitude: city.coord.lon))
         }
@@ -85,7 +79,8 @@ class SelectLocationMapView: UIViewController {
         }
     }
     
-    func checkDeiviceLocationAuthorization() {
+    // MARK: - Functions
+    private func checkDeiviceLocationAuthorization() {
         DispatchQueue.global().async {
             if CLLocationManager.locationServicesEnabled() {
                 self.checkCurrentLocationAuthorization()
@@ -95,7 +90,7 @@ class SelectLocationMapView: UIViewController {
         }
     }
     
-    func checkCurrentLocationAuthorization() {
+    private func checkCurrentLocationAuthorization() {
         var status: CLAuthorizationStatus
         
         if #available(iOS 14.0, *) {
@@ -117,7 +112,7 @@ class SelectLocationMapView: UIViewController {
         }
     }
     
-    func setRegionLocation(center: CLLocationCoordinate2D) {
+    private func setRegionLocation(center: CLLocationCoordinate2D) {
         
         let region = MKCoordinateRegion(center: center, latitudinalMeters: 500, longitudinalMeters: 500)
         mapView.setRegion(region, animated: true)
@@ -125,7 +120,7 @@ class SelectLocationMapView: UIViewController {
         
     }
     
-    func addAnnotation(center: CLLocationCoordinate2D) {
+    private func addAnnotation(center: CLLocationCoordinate2D) {
         let annotation = MKPointAnnotation()
         annotation.coordinate = CLLocationCoordinate2D(latitude: center.latitude, longitude: center.longitude)
         
@@ -140,12 +135,13 @@ class SelectLocationMapView: UIViewController {
         mapView.addAnnotation(annotation)
     }
     
-    func convertCoord() {
+    private func convertCoord() {
         let tapGestuere = UITapGestureRecognizer(target: self, action: #selector(touchMapView(_:)))
         mapView.addGestureRecognizer(tapGestuere)
     }
     
-    @objc func touchMapView(_ view: UITapGestureRecognizer) {
+    // MARK: - TapGestures Function
+    @objc private func touchMapView(_ view: UITapGestureRecognizer) {
         mapView.removeAnnotations(mapView.annotations)
         
         let location: CGPoint = view.location(in: mapView)
@@ -167,8 +163,21 @@ class SelectLocationMapView: UIViewController {
         
         mapView.addAnnotation(annotation)
     }
+    
+    // MARK: - Button Functions
+    @objc private func backButtonClicked() {
+        dismiss(animated: true)
+    }
+    
+    @objc private func selectButtonClicked() {
+        showTwoButtonAlert(title: "해당 위치의 날씨를 확인하시겠습니까?", message: nil, checkButtonTitle: "저장") { [weak self] in
+            guard let self = self else { return }
+            self.viewModel.inputselectedLocation.value = true
+        }
+    }
 }
 
+// MARK: - CLLocationManagerDelegate
 extension SelectLocationMapView: CLLocationManagerDelegate {
     
     func locationManager(_ manager: CLLocationManager, didUpdateLocations locations: [CLLocation]) {

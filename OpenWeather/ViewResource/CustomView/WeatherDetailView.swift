@@ -9,10 +9,12 @@ import UIKit
 import SnapKit
 
 final class WeatherDetailView: UIView {
+    // MARK: - Views
     private let titleImageView = UIImageView()
     private let titleLabel = UILabel()
     let divider = DividerLine(color: .gray)
     
+    // MARK: - Configurations
     init(image: String, title: String) {
         super.init(frame: .zero)
         

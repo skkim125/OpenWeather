@@ -10,6 +10,7 @@ import MapKit
 import SnapKit
 
 final class MainViewController: UIViewController {
+    // MARK: - Views
     private let scrollView = UIScrollView()
     private lazy var currentWeatherView = CurrentWeatherView()
     private let tableStackView = UIStackView()
@@ -65,14 +66,13 @@ final class MainViewController: UIViewController {
     }()
     private let mainBottomView = MainBottomView()
     
+    // MARK: - Properties
     private let userdefaultsManager = UserDefaultsManager.shared
     private var viewModel = MainViewModel()
     
+    // MARK: - Life Cycles
     override func viewDidLoad() {
         super.viewDidLoad()
-        
-        let image = #imageLiteral(resourceName: "gradationImg").cgImage
-        view.layer.contents = image
         
         configureNavigationBar()
         configureHierarchy()
@@ -82,75 +82,14 @@ final class MainViewController: UIViewController {
         bindData()
     }
     
-    private func bindData() {
-        
-        viewModel.outputNetworkingComplete.bind { [weak self] isComplete in
-            guard let self = self else { return }
-            if isComplete {
-                self.currentWeatherView.bindData(viewModel: viewModel)
-                self.threeHoursCollectionView.reloadData()
-                self.weatherDeatailCollectionView.reloadData()
-                self.fiveDaysViewTableView.reloadData()
-                self.viewModel.outputNetworkingComplete.value = false
-            }
-        }
-        
-        viewModel.outputMapCoord.bind { [weak self] coord in
-            guard let self = self else { return }
-            self.mapView.region = .init(center: CLLocationCoordinate2D(latitude: coord.0 ?? 0.0, longitude: coord.1 ?? 0.0), latitudinalMeters: 20000, longitudinalMeters: 20000)
-            
-            let marker = MKPointAnnotation()
-            marker.coordinate = CLLocationCoordinate2D(latitude: coord.0 ?? 0.0, longitude: coord.1 ?? 0.0)
-            marker.title = self.viewModel.inputCity.value?.name ?? ""
-            self.mapView.addAnnotation(marker)
-        }
-        
-        viewModel.outputShowAlert.bind { [weak self] show in
-            guard let self = self else { return }
-            if show {
-                self.showOneButtonAlert(title: "네트워크 연결 실패", message: "잠시 후 다시 시도해주세요")
-            }
-        }
+    override func viewWillAppear(_ animated: Bool) {
+        navigationController?.isNavigationBarHidden = true
     }
     
+    // MARK: - Configurations
     private func configureNavigationBar() {
         navigationItem.largeTitleDisplayMode = .never
         navigationController?.navigationBar.prefersLargeTitles = false
-    }
-    
-    @objc func mapbuttonclicked() {
-        let vc = SelectLocationMapView()
-        vc.moveData = { [weak self] city in
-            guard let self = self else { return }
-            self.viewModel.inputCity.value = city
-            self.userdefaultsManager.savedCity = city
-            self.scrollView.contentOffset = CGPoint(x: 0, y: 0)
-            print("self.userdefaultsManager.savedCity = \(self.userdefaultsManager.savedCity)")
-        }
-        
-        let nav = UINavigationController(rootViewController: vc)
-        nav.modalPresentationStyle = .fullScreen
-        
-        present(nav, animated: true)
-    }
-    
-    @objc private func cityListButtonClicked() {
-
-        let vc = CityListViewController()
-        vc.viewModel.inputCityList.value = viewModel.inputCityList.value
-        vc.viewModel.inputCity.value = viewModel.inputCity.value
-        vc.moveData = { [weak self] city in
-            guard let self = self else { return }
-            self.viewModel.inputCity.value = city
-            self.userdefaultsManager.savedCity = city
-            self.scrollView.contentOffset = CGPoint(x: 0, y: 0)
-        }
-        
-        navigationController?.pushViewController(vc, animated: true)
-    }
-    
-    override func viewWillAppear(_ animated: Bool) {
-        navigationController?.isNavigationBarHidden = true
     }
     
     private func configureHierarchy() {
@@ -237,6 +176,9 @@ final class MainViewController: UIViewController {
     }
     
     private func configureView() {
+        let image = #imageLiteral(resourceName: "gradationImg").cgImage
+        view.layer.contents = image
+        
         scrollView.showsVerticalScrollIndicator = true
         
         currentWeatherView.axis = .vertical
@@ -248,8 +190,73 @@ final class MainViewController: UIViewController {
         mainBottomView.cityListButton.addTarget(self, action: #selector(cityListButtonClicked), for: .touchUpInside)
         mainBottomView.backgroundColor = #colorLiteral(red: 0.9494348168, green: 0.9246538877, blue: 0.9809295535, alpha: 1)
     }
+    
+    // MARK: - DataBinding Function
+    private func bindData() {
+        
+        viewModel.outputNetworkingComplete.bind { [weak self] isComplete in
+            guard let self = self else { return }
+            if isComplete {
+                self.currentWeatherView.bindData(viewModel: viewModel)
+                self.threeHoursCollectionView.reloadData()
+                self.weatherDeatailCollectionView.reloadData()
+                self.fiveDaysViewTableView.reloadData()
+                self.viewModel.outputNetworkingComplete.value = false
+            }
+        }
+        
+        viewModel.outputMapCoord.bind { [weak self] coord in
+            guard let self = self else { return }
+            self.mapView.region = .init(center: CLLocationCoordinate2D(latitude: coord.0 ?? 0.0, longitude: coord.1 ?? 0.0), latitudinalMeters: 20000, longitudinalMeters: 20000)
+            
+            let marker = MKPointAnnotation()
+            marker.coordinate = CLLocationCoordinate2D(latitude: coord.0 ?? 0.0, longitude: coord.1 ?? 0.0)
+            marker.title = self.viewModel.inputCity.value?.name ?? ""
+            self.mapView.addAnnotation(marker)
+        }
+        
+        viewModel.outputShowAlert.bind { [weak self] show in
+            guard let self = self else { return }
+            if show {
+                self.showOneButtonAlert(title: "네트워크 연결 실패", message: "잠시 후 다시 시도해주세요")
+            }
+        }
+    }
+    
+    // MARK: - Button Functions
+    @objc func mapbuttonclicked() {
+        let vc = SelectLocationMapView()
+        vc.moveData = { [weak self] city in
+            guard let self = self else { return }
+            self.viewModel.inputCity.value = city
+            self.userdefaultsManager.savedCity = city
+            self.scrollView.contentOffset = CGPoint(x: 0, y: 0)
+            print("self.userdefaultsManager.savedCity = \(self.userdefaultsManager.savedCity)")
+        }
+        
+        let nav = UINavigationController(rootViewController: vc)
+        nav.modalPresentationStyle = .fullScreen
+        
+        present(nav, animated: true)
+    }
+    
+    @objc private func cityListButtonClicked() {
+
+        let vc = CityListViewController()
+        vc.viewModel.inputCityList.value = viewModel.inputCityList.value
+        vc.viewModel.inputCity.value = viewModel.inputCity.value
+        vc.moveData = { [weak self] city in
+            guard let self = self else { return }
+            self.viewModel.inputCity.value = city
+            self.userdefaultsManager.savedCity = city
+            self.scrollView.contentOffset = CGPoint(x: 0, y: 0)
+        }
+        
+        navigationController?.pushViewController(vc, animated: true)
+    }
 }
 
+// MARK: - UICollectionViewDelegate, UICollectionViewDataSource, UICollectionViewDelegateFlowLayout
 extension MainViewController: UICollectionViewDelegate, UICollectionViewDataSource, UICollectionViewDelegateFlowLayout {
     
     func collectionView(_ collectionView: UICollectionView, layout collectionViewLayout: UICollectionViewLayout, sizeForItemAt indexPath: IndexPath) -> CGSize {
@@ -267,7 +274,7 @@ extension MainViewController: UICollectionViewDelegate, UICollectionViewDataSour
         if collectionView == threeHoursCollectionView {
             return viewModel.outputSubWeather.value?.rangeOfTomorrow.count ?? 0
         } else {
-            return WeatherDetailType.allCases.count
+            return OpenWeatherRouter.WeatherDetailType.allCases.count
         }
     }
     
@@ -284,7 +291,7 @@ extension MainViewController: UICollectionViewDelegate, UICollectionViewDataSour
         } else {
             guard let cell = collectionView.dequeueReusableCell(withReuseIdentifier: WeatherDetailCollectionViewCell.id, for: indexPath) as? WeatherDetailCollectionViewCell else { return UICollectionViewCell() }
             
-            let data = WeatherDetailType.allCases[indexPath.row]
+            let data = OpenWeatherRouter.WeatherDetailType.allCases[indexPath.row]
             cell.configureView(type: data, viewModel: viewModel)
             cell.backgroundColor = .lightGray.withAlphaComponent(0.3)
             cell.layer.cornerRadius = 12
@@ -296,6 +303,7 @@ extension MainViewController: UICollectionViewDelegate, UICollectionViewDataSour
     }
 }
 
+// MARK: - UITableViewDelegate, UITableViewDataSource
 extension MainViewController: UITableViewDelegate, UITableViewDataSource {
     func tableView(_ tableView: UITableView, numberOfRowsInSection section: Int) -> Int {
         return viewModel.outputFiveDays.value.count

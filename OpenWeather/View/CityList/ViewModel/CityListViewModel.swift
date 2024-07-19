@@ -8,7 +8,7 @@
 import Foundation
 
 final class CityListViewModel {
-    // MARK: Input
+    // MARK: - Input ViewModel
     // input 트리거
     var inputTrigger: Observable<Void?> = Observable(nil) // 처음에 실행할 Trigger
     
@@ -16,7 +16,7 @@ final class CityListViewModel {
     var inputCityList: Observable<[City]> = Observable([]) // 도시 리스트
     var inputCity: Observable<City?> = Observable(nil) // 선택한 도시
     
-    // MARK: Output
+    // MARK: - Output ViewModel
     // 필터링 뷰모델
     var outputfilterList: Observable<[City]> = Observable([]) // 검색 시 필터링 되는 도시 리스트
     
@@ -25,9 +25,5 @@ final class CityListViewModel {
             guard let self = self else { return }
             self.outputfilterList.value = self.inputCityList.value
         }
-    }
-    
-    deinit {
-        print("CityListViewModel deinit")
     }
 }

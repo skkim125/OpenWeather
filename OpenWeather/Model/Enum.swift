@@ -7,22 +7,4 @@
 
 import Foundation
 
-enum WeatherDetailType: String, CaseIterable {
-    case windSpeed = "풍속"
-    case cloudy = "구름"
-    case pressure = "기압"
-    case humidity = "습도"
-    
-    var image: String {
-        switch self {
-        case .windSpeed:
-            return "wind"
-        case .cloudy:
-            return "cloud.fill"
-        case .pressure:
-            return "thermometer.medium"
-        case .humidity:
-            return "humidity"
-        }
-    }
-}
+

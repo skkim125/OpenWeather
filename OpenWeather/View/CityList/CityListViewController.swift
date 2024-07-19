@@ -9,6 +9,7 @@ import UIKit
 import SnapKit
 
 final class CityListViewController: UIViewController {
+    // MARK: - Views
     private lazy var cityListTableView: UITableView = {
         let tv = UITableView()
         tv.delegate = self
@@ -16,69 +17,83 @@ final class CityListViewController: UIViewController {
         tv.register(CityListTableViewCell.self, forCellReuseIdentifier: CityListTableViewCell.id)
         tv.rowHeight = 60
         tv.backgroundColor = .clear
-        tv.indicatorStyle = .white
+        tv.indicatorStyle = .default
         
         return tv
     }()
+    private let dividerLine = DividerLine(color: .lightGray)
     private lazy var searchBar: UISearchBar = {
         let searchBar = UISearchBar()
         searchBar.delegate = self
         searchBar.searchBarStyle = .minimal
-        searchBar.searchTextField.backgroundColor = .darkGray
-        searchBar.searchTextField.textColor = .white
+        searchBar.searchTextField.backgroundColor = .lightGray.withAlphaComponent(0.3)
+        searchBar.searchTextField.textColor = .black
         
         return searchBar
     }()
     
+    // MARK: - Properties
     var viewModel = CityListViewModel()
     var moveData: ((City)->())?
     
+    // MARK: - Life Cycle
     override func viewDidLoad() {
         super.viewDidLoad()
 
-        view.backgroundColor = .black
         configureNavigationBar()
         configureHierarchy()
         configureLayout()
+        configureView()
         bindData()
     }
     
+    // MARK: - Configurations
     private func configureNavigationBar() {
         navigationItem.title = "City List"
-        navigationController?.navigationBar.largeTitleTextAttributes = [.foregroundColor: UIColor.white]
+        navigationController?.navigationBar.largeTitleTextAttributes = [.foregroundColor: UIColor.black.withAlphaComponent(0.8)]
         navigationItem.largeTitleDisplayMode = .always
         navigationController?.navigationBar.prefersLargeTitles = true
         navigationController?.isNavigationBarHidden = false
         
-        navigationController?.navigationBar.tintColor = .white
+        navigationController?.navigationBar.tintColor = .darkGray
         
         navigationItem.leftBarButtonItem = UIBarButtonItem(image: UIImage(systemName: "chevron.backward"), style: .plain, target: self, action: #selector(backButtonClicked))
         
         navigationController?.isToolbarHidden = true
     }
     
-    @objc private func backButtonClicked() {
-        navigationController?.popViewController(animated: true)
-    }
-    
     private func configureHierarchy() {
         view.addSubview(searchBar)
+        view.addSubview(dividerLine)
         view.addSubview(cityListTableView)
     }
     
     private func configureLayout() {
         searchBar.snp.makeConstraints { make in
-            make.top.equalTo(view.safeAreaLayoutGuide).offset(10)
+            make.top.equalTo(view.safeAreaLayoutGuide)
             make.horizontalEdges.equalTo(view.safeAreaLayoutGuide)
             make.height.equalTo(40)
         }
         
         cityListTableView.snp.makeConstraints { make in
             make.top.equalTo(searchBar.snp.bottom).offset(10)
-            make.horizontalEdges.bottom.equalTo(view.safeAreaLayoutGuide)
+            make.horizontalEdges.equalTo(view.safeAreaLayoutGuide)
+            make.bottom.equalToSuperview()
+        }
+        
+        dividerLine.snp.makeConstraints { make in
+            make.top.equalTo(cityListTableView.snp.top)
+            make.horizontalEdges.equalTo(cityListTableView)
+            make.height.equalTo(0.2)
         }
     }
     
+    private func configureView() {
+        let image = #imageLiteral(resourceName: "gradationImg").cgImage
+        view.layer.contents = image
+    }
+    
+    // MARK: - Data Binding Functions
     func bindData() {
         viewModel.inputTrigger.value = ()
         
@@ -87,8 +102,27 @@ final class CityListViewController: UIViewController {
             self.cityListTableView.reloadData()
         }
     }
+    
+    // MARK: - Button Functions
+    @objc private func backButtonClicked() {
+        navigationController?.popViewController(animated: true)
+    }
+    
+    // MARK: - Functions
+    func filterCities(text: String) {
+        var filterList: [City] = []
+        
+        for city in viewModel.inputCityList.value {
+            if city.name.lowercased().contains(text.lowercased().trimmingCharacters(in: .whitespaces)) {
+                filterList.append(city)
+            }
+        }
+        
+        viewModel.outputfilterList.value = filterList
+    }
 }
 
+// MARK: - UITableViewDelegate, UITableViewDataSource
 extension CityListViewController: UITableViewDelegate, UITableViewDataSource {
     func tableView(_ tableView: UITableView, numberOfRowsInSection section: Int) -> Int {
         return viewModel.outputfilterList.value.count
@@ -102,6 +136,7 @@ extension CityListViewController: UITableViewDelegate, UITableViewDataSource {
         cell.configureView(city: data, isHidden: isHidden)
         
         cell.selectionStyle = .none
+        cell.separatorInset = .zero
         
         return cell
     }
@@ -116,6 +151,7 @@ extension CityListViewController: UITableViewDelegate, UITableViewDataSource {
     }
 }
 
+// MARK: - UISearchBarDelegate
 extension CityListViewController: UISearchBarDelegate {
     func searchBarSearchButtonClicked(_ searchBar: UISearchBar) {
         view.endEditing(true)
@@ -134,17 +170,5 @@ extension CityListViewController: UISearchBarDelegate {
         searchBar.text = nil
         
         viewModel.outputfilterList.value = viewModel.inputCityList.value
-    }
-    
-    func filterCities(text: String) {
-        var filterList: [City] = []
-        
-        for city in viewModel.inputCityList.value {
-            if city.name.lowercased().contains(text.lowercased().trimmingCharacters(in: .whitespaces)) {
-                filterList.append(city)
-            }
-        }
-        
-        viewModel.outputfilterList.value = filterList
     }
 }

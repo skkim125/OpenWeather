@@ -9,10 +9,11 @@ import UIKit
 import SnapKit
 
 final class CurrentWeatherView: UIStackView {
+    // MARK: - Views
     private let cityNameLabel = {
         let label = UILabel()
         label.textColor = .black.withAlphaComponent(0.8)
-        label.font = .systemFont(ofSize: 40)
+        label.font = .systemFont(ofSize: 30)
         label.textAlignment = .center
         
         return label
@@ -20,7 +21,7 @@ final class CurrentWeatherView: UIStackView {
     private let currentTemperatureLabel = {
         let label = UILabel()
         label.textColor = .black.withAlphaComponent(0.8)
-        label.font = .systemFont(ofSize: 70)
+        label.font = .systemFont(ofSize: 80)
         label.textAlignment = .center
         
         return label
@@ -42,6 +43,7 @@ final class CurrentWeatherView: UIStackView {
         return label
     }()
     
+    // MARK: - Configurations
     init() {
         super.init(frame: .zero)
         
@@ -49,6 +51,36 @@ final class CurrentWeatherView: UIStackView {
         configureLayout()
     }
     
+    private func configureHierarchy() {
+        addArrangedSubview(cityNameLabel)
+        addArrangedSubview(currentTemperatureLabel)
+        addArrangedSubview(weatherOverviewLabel)
+        addArrangedSubview(max_minTemperatureLabel)
+    }
+    
+    private func configureLayout() {
+        cityNameLabel.snp.makeConstraints { make in
+            make.top.equalTo(self.snp.top)
+            make.height.equalTo(60)
+            make.horizontalEdges.equalTo(self.safeAreaLayoutGuide)
+        }
+        
+        currentTemperatureLabel.snp.makeConstraints { make in
+            make.height.equalTo(70)
+        }
+        
+        weatherOverviewLabel.snp.makeConstraints { make in
+            make.height.equalTo(30)
+            make.centerX.equalTo(self.snp.centerX)
+        }
+        
+        max_minTemperatureLabel.snp.makeConstraints { make in
+            make.height.equalTo(30)
+            make.centerX.equalTo(self.snp.centerX)
+        }
+    }
+    
+    // MARK: - Data Binding Functions
     func bindData(viewModel: MainViewModel) {
         
         viewModel.outputCityName.bind { [weak self] cityName in
@@ -69,35 +101,6 @@ final class CurrentWeatherView: UIStackView {
         viewModel.outputWeatherOverview.bind { [weak self] overview in
             guard let self = self else { return }
             self.weatherOverviewLabel.text = overview
-        }
-    }
-    
-    private func configureHierarchy() {
-        addArrangedSubview(cityNameLabel)
-        addArrangedSubview(currentTemperatureLabel)
-        addArrangedSubview(weatherOverviewLabel)
-        addArrangedSubview(max_minTemperatureLabel)
-    }
-    
-    private func configureLayout() {
-        cityNameLabel.snp.makeConstraints { make in
-            make.top.equalTo(self.snp.top)
-            make.height.equalTo(50)
-            make.horizontalEdges.equalTo(self.safeAreaLayoutGuide)
-        }
-        
-        currentTemperatureLabel.snp.makeConstraints { make in
-            make.height.equalTo(70)
-        }
-        
-        weatherOverviewLabel.snp.makeConstraints { make in
-            make.height.equalTo(30)
-            make.centerX.equalTo(self.snp.centerX)
-        }
-        
-        max_minTemperatureLabel.snp.makeConstraints { make in
-            make.height.equalTo(30)
-            make.centerX.equalTo(self.snp.centerX)
         }
     }
     

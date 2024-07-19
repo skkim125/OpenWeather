@@ -9,6 +9,7 @@ import UIKit
 import SnapKit
 
 final class WeatherDetailCollectionViewCell: UICollectionViewCell {
+    // MARK: - Views
     private let detailImageView = {
         let imageView = UIImageView()
         imageView.contentMode = .scaleAspectFit
@@ -31,6 +32,7 @@ final class WeatherDetailCollectionViewCell: UICollectionViewCell {
         return label
     }()
     
+    // MARK: - COnfigurations
     override init(frame: CGRect) {
         super.init(frame: frame)
         
@@ -63,13 +65,14 @@ final class WeatherDetailCollectionViewCell: UICollectionViewCell {
         }
     }
     
-    func configureView(type: WeatherDetailType, viewModel: MainViewModel) {
+    func configureView(type: OpenWeatherRouter.WeatherDetailType, viewModel: MainViewModel) {
         detailImageView.image = UIImage(systemName: type.image)
         detailLabel.text = type.rawValue
         detailValueLabel.text = setWeatherDetailValue(type: type, viewModel: viewModel)
     }
     
-    private func setWeatherDetailValue(type: WeatherDetailType, viewModel: MainViewModel) -> String {
+    // MARK: - Functions
+    private func setWeatherDetailValue(type: OpenWeatherRouter.WeatherDetailType, viewModel: MainViewModel) -> String {
         switch type {
         case .windSpeed:
             return viewModel.outputWindSpeed.value ?? "--m/s"
@@ -82,6 +85,7 @@ final class WeatherDetailCollectionViewCell: UICollectionViewCell {
         }
     }
     
+    @available(*, unavailable)
     required init?(coder: NSCoder) {
         fatalError("init(coder:) has not been implemented")
     }

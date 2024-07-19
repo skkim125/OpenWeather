@@ -10,6 +10,7 @@ import Kingfisher
 import SnapKit
 
 final class FiveDaysTableViewCell: UITableViewCell {
+    // MARK: - Views
     private let daysLabel: UILabel = {
         let label = UILabel()
         label.font = .boldSystemFont(ofSize: 20)
@@ -40,6 +41,7 @@ final class FiveDaysTableViewCell: UITableViewCell {
         return label
     }()
     
+    // MARK: - Configurations
     override init(style: UITableViewCell.CellStyle, reuseIdentifier: String?) {
         super.init(style: style, reuseIdentifier: reuseIdentifier)
         
@@ -90,6 +92,7 @@ final class FiveDaysTableViewCell: UITableViewCell {
         maxTempLabel.text = "최고" + String.transTempStr(maxWeather.weatherDetail.temp_max)
     }
     
+    @available(*, unavailable)
     required init?(coder: NSCoder) {
         fatalError("init(coder:) has not been implemented")
     }

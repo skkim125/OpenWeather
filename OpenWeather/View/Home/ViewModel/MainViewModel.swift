@@ -8,15 +8,16 @@
 import Foundation
 
 final class MainViewModel {
+    // MARK: - SingleTon Class
     private let owManager = OpenWeatherManager.shared
     private let userdefaultsManager = UserDefaultsManager.shared
     
-    // MARK: Input
+    // MARK: - Input ViewModel
     // 도시 뷰모델
     var inputCity: Observable<City?> = Observable(nil)
     var inputCityList: Observable<[City]> = Observable([])
     
-    // MARK: Output
+    // MARK: - Output ViewModel
     // OpenWeatherAPI 통신 관련 뷰모델
     var outputCurrentWeather: Observable<Weather?> = Observable(nil) // 출력할 현재 날씨
     var outputSubWeather: Observable<SubWeather?> = Observable(nil) // 출력할 서브 날씨
@@ -47,15 +48,9 @@ final class MainViewModel {
         transform()
     }
     
-    deinit {
-        print("mainviewmodel deinit")
-    }
-    
     func transform() {
         fetchJson()
         setInputCity()
-        print(userdefaultsManager.savedCity)
-        print(inputCity.value)
         
         inputCity.bind { [weak self] city in
             print("바인딩 됨")
