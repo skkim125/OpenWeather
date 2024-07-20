@@ -120,6 +120,9 @@ final class SelectLocationMapView: UIViewController {
     }
     
     private func addAnnotation(center: CLLocationCoordinate2D, title: String) {
+        if !mapView.annotations.isEmpty {
+            mapView.removeAnnotations(mapView.annotations)
+        }
         let annotation = MKPointAnnotation()
         annotation.coordinate = CLLocationCoordinate2D(latitude: center.latitude, longitude: center.longitude)
         annotation.title = title
