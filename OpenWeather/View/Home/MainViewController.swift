@@ -43,13 +43,7 @@ final class MainViewController: UIViewController {
         return tv
     }()
     private let currentLocationView = WeatherDetailView(image: "mappin.and.ellipse", title: "위치")
-    private let mapView = {
-        let map = MKMapView()
-        map.isScrollEnabled = false
-        map.isRotateEnabled = false
-        
-        return map
-    }()
+    private let mapView = MKMapView()
     private lazy var weatherDeatailCollectionView = {
         let layout = UICollectionViewFlowLayout()
         layout.sectionInset = .init(top: 0, left: 0, bottom: 10, right: 0)
@@ -207,12 +201,7 @@ final class MainViewController: UIViewController {
         
         viewModel.outputMapCoord.bind { [weak self] coord in
             guard let self = self else { return }
-            self.mapView.region = .init(center: CLLocationCoordinate2D(latitude: coord.0 ?? 0.0, longitude: coord.1 ?? 0.0), latitudinalMeters: 20000, longitudinalMeters: 20000)
-            
-            let marker = MKPointAnnotation()
-            marker.coordinate = CLLocationCoordinate2D(latitude: coord.0 ?? 0.0, longitude: coord.1 ?? 0.0)
-            marker.title = self.viewModel.inputCity.value?.name ?? ""
-            self.mapView.addAnnotation(marker)
+            self.setRegion(coord: coord)
         }
         
         viewModel.outputShowAlert.bind { [weak self] show in
@@ -252,6 +241,22 @@ final class MainViewController: UIViewController {
         }
         
         navigationController?.pushViewController(vc, animated: true)
+    }
+    
+    func setRegion(coord: (Double?, Double?)) {
+        mapView.region = .init(center: CLLocationCoordinate2D(latitude: coord.0 ?? 0.0, longitude: coord.1 ?? 0.0), latitudinalMeters: 20000, longitudinalMeters: 20000)
+        setAnnotation(coord: coord)
+    }
+    
+    func setAnnotation(coord: (Double?, Double?)) {
+        if !mapView.annotations.isEmpty {
+            mapView.removeAnnotations(mapView.annotations)
+        }
+        
+        let marker = MKPointAnnotation()
+        marker.coordinate = CLLocationCoordinate2D(latitude: coord.0 ?? 0.0, longitude: coord.1 ?? 0.0)
+        marker.title = viewModel.inputCity.value?.name ?? ""
+        mapView.addAnnotation(marker)
     }
 }
 
