@@ -30,6 +30,10 @@ struct Weather: Decodable {
         
         let date = Date(timeIntervalSince1970: TimeInterval(self.dt))
         
+        if Calendar.current.isDateInToday(date) {
+            return "오늘"
+        }
+        
         return formatter.string(from: date)
     }
     
@@ -76,13 +80,17 @@ struct SubWeather: Decodable {
     }
     
     var fiveDays: [Weather] {
-        let fiveDaysArray = result.filter({ date in
-            let fiveDays = Date().addingTimeInterval(86400 * 4).timeIntervalSince1970
-            return TimeInterval(date.dt) <= fiveDays
-        }).filter({ date in
-            let day = Date(timeIntervalSince1970: TimeInterval(date.dt)).timeIntervalSince1970
-            let startDay = Calendar.current.startOfDay(for: Date(timeIntervalSince1970: TimeInterval(date.dt))).timeIntervalSince1970
-            let endDay = Calendar.current.startOfDay(for: Date(timeIntervalSince1970: TimeInterval(date.dt))).addingTimeInterval(86399).timeIntervalSince1970
+        guard let first = result.first else { return [] }
+        let fiveDaysArray = result.filter({ current in
+            let isToday = Calendar.current.isDateInToday(Date(timeIntervalSince1970: TimeInterval(first.dt)))
+            let difference: Double = isToday ? 4 : 5
+            let fiveDays = Date().addingTimeInterval(86400 * difference).timeIntervalSince1970
+            
+            return TimeInterval(current.dt) <= fiveDays
+        }).filter({ dw in
+            let day = Date(timeIntervalSince1970: TimeInterval(dw.dt)).timeIntervalSince1970
+            let startDay = Calendar.current.startOfDay(for: Date(timeIntervalSince1970: TimeInterval(dw.dt))).timeIntervalSince1970
+            let endDay = Calendar.current.startOfDay(for: Date(timeIntervalSince1970: TimeInterval(dw.dt))).addingTimeInterval(86399).timeIntervalSince1970
             
             return day >= startDay && day <= endDay
         })

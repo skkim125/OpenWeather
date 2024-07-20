@@ -41,7 +41,6 @@
 		047EB4D22C491D5200612562 /* SelectLocationMapViewModel.swift in Sources */ = {isa = PBXBuildFile; fileRef = 047EB4D12C491D5200612562 /* SelectLocationMapViewModel.swift */; };
 		04FD29572C437FB8001C6739 /* WeatherDetailCollectionViewCell.swift in Sources */ = {isa = PBXBuildFile; fileRef = 04FD29562C437FB8001C6739 /* WeatherDetailCollectionViewCell.swift */; };
 		04FD29592C438ADC001C6739 /* UIViewController+Extension.swift in Sources */ = {isa = PBXBuildFile; fileRef = 04FD29582C438ADC001C6739 /* UIViewController+Extension.swift */; };
-		04FD295B2C439304001C6739 /* Enum.swift in Sources */ = {isa = PBXBuildFile; fileRef = 04FD295A2C439304001C6739 /* Enum.swift */; };
 /* End PBXBuildFile section */
 
 /* Begin PBXFileReference section */
@@ -77,7 +76,6 @@
 		047EB4D12C491D5200612562 /* SelectLocationMapViewModel.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SelectLocationMapViewModel.swift; sourceTree = "<group>"; };
 		04FD29562C437FB8001C6739 /* WeatherDetailCollectionViewCell.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = WeatherDetailCollectionViewCell.swift; sourceTree = "<group>"; };
 		04FD29582C438ADC001C6739 /* UIViewController+Extension.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "UIViewController+Extension.swift"; sourceTree = "<group>"; };
-		04FD295A2C439304001C6739 /* Enum.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Enum.swift; sourceTree = "<group>"; };
 /* End PBXFileReference section */
 
 /* Begin PBXFrameworksBuildPhase section */
@@ -187,7 +185,6 @@
 			children = (
 				04671F832C3FD92000EF5C1B /* Weather.swift */,
 				0425CB892C4257B800B94F4D /* City.swift */,
-				04FD295A2C439304001C6739 /* Enum.swift */,
 			);
 			path = Model;
 			sourceTree = "<group>";
@@ -340,7 +337,6 @@
 			files = (
 				04671F8E2C40EE5300EF5C1B /* Observable.swift in Sources */,
 				0425CBA32C42CF3D00B94F4D /* String+Extension.swift in Sources */,
-				04FD295B2C439304001C6739 /* Enum.swift in Sources */,
 				04671F842C3FD92000EF5C1B /* Weather.swift in Sources */,
 				04671F662C3FBDD700EF5C1B /* MainViewController.swift in Sources */,
 				04671F9B2C411B6300EF5C1B /* IDProtocol.swift in Sources */,

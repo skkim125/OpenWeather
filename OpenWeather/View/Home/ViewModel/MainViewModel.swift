@@ -128,8 +128,8 @@ final class MainViewModel {
                 self.outputShowAlert.value = false
                 self.addMinMaxTemp(data: data)
                 self.outputFiveDays.value = self.mappingFiveDays(fiveDays: data.fiveDays)
-                if let day = self.outputCurrentWeather.value?.day {
-                    self.setOutputMaxAndMinTemperature(day: day)
+                if let today = self.outputCurrentWeather.value, let day = self.outputSubWeather.value?.result.first {
+                    self.setOutputMaxAndMinTemperature(today: today.day, day: day.day)
                 }
             case .failure(let error):
                 print(error)
@@ -160,12 +160,16 @@ final class MainViewModel {
         }
     }
     
-    private func setOutputMaxAndMinTemperature(day: String) {
+    private func setOutputMaxAndMinTemperature(today: String, day: String) {
         if let current = outputCurrentWeather.value {
-            let cwMinTemp: String? = String(outputMinMaxTempOfDay.value[day]?.0.weatherDetail.temp_min ?? current.weatherDetail.temp_min)
-            let cwMaxTemp: String? = String(outputMinMaxTempOfDay.value[day]?.1.weatherDetail.temp_max ?? current.weatherDetail.temp_max)
-            
-            outputMaxAndMinTemperature.value = "최고: \(cwMaxTemp ?? "--")º | 최저: \(cwMinTemp ?? "--")º"
+            if today == day {
+                let cwMinTemp: String? = String(outputMinMaxTempOfDay.value[today]?.0.weatherDetail.temp_min ?? current.weatherDetail.temp_min)
+                let cwMaxTemp: String? = String(outputMinMaxTempOfDay.value[today]?.1.weatherDetail.temp_max ?? current.weatherDetail.temp_max)
+                
+                outputMaxAndMinTemperature.value = "최고: \(cwMaxTemp ?? "--")º | 최저: \(cwMinTemp ?? "--")º"
+            } else {
+                self.outputMaxAndMinTemperature.value = "최고: \(current.weatherDetail.temp_max)º | 최저: \(current.weatherDetail.temp_min)º"
+            }
         }
     }
     

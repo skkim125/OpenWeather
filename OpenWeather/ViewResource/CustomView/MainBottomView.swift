@@ -10,8 +10,22 @@ import SnapKit
 
 final class MainBottomView: UIView {
     // MARK: - Views
-    let mapButton = UIButton()
-    let cityListButton = UIButton()
+    let mapButton = {
+        let button = UIButton()
+        button.setImage(UIImage(systemName: "map"), for: .normal)
+        button.imageView?.contentMode = .scaleAspectFit
+        button.tintColor = .black
+        
+        return button
+    }()
+    let cityListButton = {
+        let button = UIButton()
+        button.setImage(UIImage(systemName: "list.bullet"), for: .normal)
+        button.imageView?.contentMode = .scaleAspectFit
+        button.tintColor = .black
+        
+        return button
+    }()
     
     // MARK: - COnfigurations
     init() {
@@ -20,9 +34,6 @@ final class MainBottomView: UIView {
         configureHierarchy()
         configureLayout()
         configureView()
-        
-        self.layer.borderWidth = 0.2
-        self.layer.borderColor = UIColor.lightGray.cgColor
     }
     
     private func configureHierarchy() {
@@ -45,13 +56,8 @@ final class MainBottomView: UIView {
     }
     
     private func configureView() {
-        mapButton.setImage(UIImage(systemName: "map"), for: .normal)
-        mapButton.imageView?.contentMode = .scaleAspectFit
-        mapButton.tintColor = .black
-        
-        cityListButton.setImage(UIImage(systemName: "list.bullet"), for: .normal)
-        cityListButton.imageView?.contentMode = .scaleAspectFit
-        cityListButton.tintColor = .black
+        self.layer.borderWidth = 0.2
+        self.layer.borderColor = UIColor.lightGray.cgColor
     }
     
     @available(*, unavailable)
