@@ -81,9 +81,17 @@ final class SelectLocationMapView: UIViewController {
     private func checkDeviceLocationAuthorization() {
         DispatchQueue.global().async {
             if CLLocationManager.locationServicesEnabled() {
-                self.checkCurrentLocationAuthorization()
+                DispatchQueue.main.async {
+                    self.checkCurrentLocationAuthorization()
+                }
             } else {
-                print("위치 권한 거부됨")
+                DispatchQueue.main.async {
+                    self.showTwoButtonAlert(title: "위치 서비스를 이용할 수 없습니다.", message: "'설정 > 개인정보 보호 및 보안'에서 위치 서비스를 허용주세요.", checkButtonTitle: "설정하러 가기") {
+                        if let deviceSetting = URL(string: UIApplication.openSettingsURLString) {
+                            UIApplication.shared.open(deviceSetting)
+                        }
+                    }
+                }
             }
         }
     }
